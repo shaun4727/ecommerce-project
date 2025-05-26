@@ -1,0 +1,18 @@
+.register-section {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+}
+.register-section .create-new-account {
+  border: var(--default-border);
+  border-radius: var(--default-border-radius);
+  padding: var(--default-padding);
+}
+
+p.login-redirection span {
+  @apply text-primary cursor-pointer;
+}
+.register-section .create-new-account .error-message {
+  color: red !important;
+}

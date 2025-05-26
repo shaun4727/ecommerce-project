@@ -1,0 +1,18 @@
+.login-section {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+}
+.login-section .sign-in {
+  border: 1px solid #d3d3d3;
+  border-radius: var(--default-border-radius);
+  padding: var(--default-padding);
+}
+.login-section .sign-in .error-message {
+  color: red !important;
+}
+p.login-redirection span {
+  color: var(--primary-color);
+  cursor: pointer;
+}
