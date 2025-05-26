@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -6,10 +8,88 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import EPImageUploader from '@/components/ui/core/EPImageUploader';
+import ImagePreviewer from '@/components/ui/core/EPImageUploader/ImagePreviewer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { createShopService } from '@/service/shop';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import './assets/create-shop.css';
+
+const socialSchema = z.object({
+  facebook: z.string().min(1, 'Facebook ID is required'),
+  twitter: z.string().min(1, 'Twitter ID is required'),
+  instagram: z.string().min(1, 'Instagram is required'),
+});
+
+const createShopSchema = z.object({
+  shopName: z.string().min(1, 'Shop Name is required'),
+  businessLicenseNumber: z.string().min(1, 'Business License no is required'),
+  address: z.string().min(1, 'Address is required'),
+  contactNumber: z.string().min(1, 'Contact No. is required'),
+  website: z.string().min(1, 'Website is required'),
+  establishedYear: z.string().min(1, 'Established year is required'),
+  taxIdentificationNumber: z.string().min(1, 'TIN is required'),
+  socialMediaLinks: socialSchema,
+  servicesOffered: z.string().min(1, 'Services are required'),
+});
+
+type shopFormData = z.infer<typeof createShopSchema>;
 
 export default function CreateShopComponent() {
+  const [imagePreview, setImagePreview] = useState<string[] | []>([]);
+  const [imageFiles, setImageFiles] = useState<File[] | []>([]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<shopFormData>({
+    resolver: zodResolver(createShopSchema),
+  });
+
+  const onSubmit = async (data: shopFormData) => {
+    let toastId: string | number = 1;
+    toast.loading('...Loading', { id: toastId });
+    const servicesOffered = data?.servicesOffered
+      ?.split(',')
+      .map((service: string) => service.trim())
+      .filter((service: string) => service !== '');
+
+    const modifiedData = {
+      ...data,
+      servicesOffered: servicesOffered,
+      establishedYear: Number(data?.establishedYear),
+    };
+
+    try {
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(modifiedData));
+      formData.append('logo', imageFiles[0]);
+      const res = await createShopService(formData);
+
+      console.log(res);
+
+      if (res.success) {
+        reset();
+        setImagePreview([]);
+        toast.success(res.message);
+      } else {
+        console.log(res.message);
+        toastId = toast.error(res.message, { id: toastId });
+      }
+    } catch (err: any) {
+      toast.error('error occured', { id: toastId });
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
       <Card className="w-full max-w-4xl">
@@ -25,7 +105,7 @@ export default function CreateShopComponent() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column */}
               <div className="space-y-4">
@@ -38,9 +118,12 @@ export default function CreateShopComponent() {
                   </Label>
                   <Input
                     id="shopName"
-                    defaultValue="abc"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
+                    {...register('shopName')}
                   />
+                  {errors.shopName && (
+                    <p className="error-message">{errors.shopName.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -51,10 +134,13 @@ export default function CreateShopComponent() {
                     Address
                   </Label>
                   <Input
+                    {...register('address')}
                     id="address"
-                    defaultValue="Dhaka"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.address && (
+                    <p className="error-message">{errors.address.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -65,10 +151,13 @@ export default function CreateShopComponent() {
                     Website
                   </Label>
                   <Input
+                    {...register('website')}
                     id="website"
-                    defaultValue="https://web.programming-hero.com"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.website && (
+                    <p className="error-message">{errors.website.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -76,10 +165,15 @@ export default function CreateShopComponent() {
                     Tax Identification Number
                   </Label>
                   <Input
+                    {...register('taxIdentificationNumber')}
                     id="taxId"
-                    defaultValue="123456"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.taxIdentificationNumber && (
+                    <p className="error-message">
+                      {errors.taxIdentificationNumber.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -91,9 +185,32 @@ export default function CreateShopComponent() {
                   </Label>
                   <Input
                     id="twitter"
-                    defaultValue="https://www.facebook.com/"
+                    className="bg-blue-50 border-blue-100 focus:border-blue-300"
+                    {...register('socialMediaLinks.twitter')}
+                  />
+                  {errors.socialMediaLinks?.twitter && (
+                    <p className="error-message">
+                      {errors.socialMediaLinks.twitter.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="services-offered"
+                    className="text-gray-700 font-medium"
+                  >
+                    Services Offered
+                  </Label>
+                  <Textarea
+                    {...register('servicesOffered')}
+                    id="services-offered"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.servicesOffered && (
+                    <p className="error-message">
+                      {errors.servicesOffered.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -108,9 +225,14 @@ export default function CreateShopComponent() {
                   </Label>
                   <Input
                     id="businessLicense"
-                    defaultValue="123456"
+                    {...register('businessLicenseNumber')}
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.businessLicenseNumber && (
+                    <p className="error-message">
+                      {errors.businessLicenseNumber.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -121,10 +243,15 @@ export default function CreateShopComponent() {
                     Contact Number
                   </Label>
                   <Input
+                    {...register('contactNumber')}
                     id="contactNumber"
-                    defaultValue="01234567891"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.contactNumber && (
+                    <p className="error-message">
+                      {errors.contactNumber.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -135,10 +262,15 @@ export default function CreateShopComponent() {
                     Established Year
                   </Label>
                   <Input
+                    {...register('establishedYear')}
                     id="establishedYear"
-                    defaultValue="2015"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.establishedYear && (
+                    <p className="error-message">
+                      {errors.establishedYear.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -149,10 +281,15 @@ export default function CreateShopComponent() {
                     Facebook
                   </Label>
                   <Input
+                    {...register('socialMediaLinks.facebook')}
                     id="facebook"
-                    defaultValue="https://www.facebook.com/"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.socialMediaLinks?.facebook && (
+                    <p className="error-message">
+                      {errors.socialMediaLinks.facebook.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -163,11 +300,34 @@ export default function CreateShopComponent() {
                     Instagram
                   </Label>
                   <Input
+                    {...register('socialMediaLinks.instagram')}
                     id="instagram"
-                    defaultValue="https://www.facebook.com/"
                     className="bg-blue-50 border-blue-100 focus:border-blue-300"
                   />
+                  {errors.socialMediaLinks?.instagram && (
+                    <p className="error-message">
+                      {errors.socialMediaLinks.instagram.message}
+                    </p>
+                  )}
                 </div>
+
+                {imagePreview.length > 0 ? (
+                  <ImagePreviewer
+                    setImageFiles={setImageFiles}
+                    imagePreview={imagePreview}
+                    setImagePreview={setImagePreview}
+                    className="mt-8 flex gap-2"
+                  />
+                ) : (
+                  <div className="mt-8">
+                    {' '}
+                    <EPImageUploader
+                      setImageFiles={setImageFiles}
+                      setImagePreview={setImagePreview}
+                      label="Upload Logo"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

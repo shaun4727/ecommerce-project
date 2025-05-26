@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUser } from '@/context/UserContext';
 import {
   loginUserApi,
   reCaptchaTokenVerification,
@@ -28,7 +27,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 const LoginPageComponent = () => {
   const router = useRouter();
-  const { setIsLoading, isLoading } = useUser();
+
   const [reCaptchaStatus, setReCaptchaStatus] = useState(false);
   const {
     register,
@@ -132,7 +131,6 @@ const LoginPageComponent = () => {
                 type="email"
                 {...register('email')}
                 className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                required
               />
             </div>
             {errors.email && (
@@ -147,7 +145,6 @@ const LoginPageComponent = () => {
                 id="password"
                 type="password"
                 className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                required
                 {...register('password')}
               />
             </div>
