@@ -35,6 +35,10 @@ export const loginUserApi = async (userData: Record<string, unknown>) => {
 
     if (result.success) {
       (await cookies()).set('ecommerce-accessToken', result.data.accessToken);
+      (await cookies()).set(
+        'ecommerce-refreshToken',
+        result?.data?.refreshToken
+      );
     }
     // console.log(result);
     return result;
@@ -76,4 +80,23 @@ export const reCaptchaTokenVerification = async (token: string) => {
 
 export const logout = async () => {
   (await cookies()).delete('ecommerce-accessToken');
+};
+
+export const getNewToken = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: (await cookies()).get('ecommerce-refreshToken')!.value,
+        },
+      }
+    );
+
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
 };

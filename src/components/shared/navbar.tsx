@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { protectedRoutes } from '@/constants';
 import { useUser } from '@/context/UserContext';
 import { logout } from '@/service/AuthService';
 import {
@@ -26,9 +27,11 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
+import MobileSidebarNav from './responsive-sidebar-menu';
 
 const megaMenuCategories = {
   Men: [
@@ -72,7 +75,10 @@ const megaMenuCategories = {
 export default function NavbarComponent() {
   const [isClothingOpen, setIsClothingOpen] = useState(false);
 
-  const { user, setIsLoading, isLoading } = useUser();
+  const { user, setIsLoading } = useUser();
+
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     setIsLoading(true);
@@ -80,10 +86,13 @@ export default function NavbarComponent() {
   const handleLogout = () => {
     logout();
     setIsLoading(true);
+    if (protectedRoutes.some((route) => pathname.match(route))) {
+      router.push('/');
+    }
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       {/* Top Header Bar */}
       <div className="bg-blue-600 text-white text-sm">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
@@ -142,7 +151,7 @@ export default function NavbarComponent() {
             </a>
             {!user && (
               <Link href="/login">
-                <Button className="flex bg-yellow-500 hover:bg-yellow-600 items-center space-x-1 text-black">
+                <Button className=" flex bg-yellow-500 hover:bg-yellow-600 items-center space-x-1 text-black">
                   <LogIn className="h-4 w-4" />
                   <span>Login</span>
                 </Button>
@@ -154,7 +163,7 @@ export default function NavbarComponent() {
 
       {/* Main Header */}
       <div className="bg-blue-700 text-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="flex flex-col gap-3 items-center lg:flex-row lg:justify-center lg:py-4  ">
           {/* Logo */}
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-yellow-400">Flipmart</h1>
@@ -164,24 +173,12 @@ export default function NavbarComponent() {
             <div className="flex h-11">
               {' '}
               {/* consistent height for all children */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="bg-blue-600 text-white px-4 border-r border-blue-600 flex items-center space-x-2 rounded-l-md h-full">
-                  <span>Categories</span>
-                  <ChevronDown className="h-4 w-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Electronics</DropdownMenuItem>
-                  <DropdownMenuItem>Clothing</DropdownMenuItem>
-                  <DropdownMenuItem>Health & Beauty</DropdownMenuItem>
-                  <DropdownMenuItem>Watches</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
               <Input
                 placeholder="Search here..."
                 className="flex-1 bg-white border-r border-gray-300 rounded-none h-full focus-visible:ring-0"
               />
               <Button
-                className="bg-yellow-500 hover:bg-yellow-600 text-black rounded-l-none px-6 h-full"
+                className=" bg-yellow-500 hover:bg-yellow-600 text-black rounded-l-none px-6 h-full md:btn-default"
                 aria-label="Search"
               >
                 <Search className="h-4 w-4" />
@@ -201,7 +198,7 @@ export default function NavbarComponent() {
       </div>
 
       {/* Navigation Menu */}
-      <div className="w-full">
+      <div className="w-full hidden lg:block ">
         {/* Main Navigation */}
         <nav className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
           <div className="max-w-7xl mx-auto px-4">
@@ -375,6 +372,9 @@ export default function NavbarComponent() {
             </div>
           </div>
         )}
+      </div>
+      <div className="block lg:hidden">
+        <MobileSidebarNav />
       </div>
     </div>
   );

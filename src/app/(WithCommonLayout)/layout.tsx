@@ -1,4 +1,4 @@
-import '@/assets/root.css';
+import FooterSection from '@/components/shared/footer-section';
 import NavbarComponent from '@/components/shared/navbar';
 
 const CommonLayout = ({ children }: { children: React.ReactNode }) => {
@@ -7,6 +7,7 @@ const CommonLayout = ({ children }: { children: React.ReactNode }) => {
       {' '}
       <NavbarComponent />
       {children}
+      <FooterSection />
     </div>
   );
 };

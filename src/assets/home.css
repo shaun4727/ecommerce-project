@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+@theme {
+  --small: 800px;
+}
+
+@layer components {
+  .large-screen-nav {
+    @apply flex-row justify-center py-4;
+  }
+}

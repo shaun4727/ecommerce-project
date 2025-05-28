@@ -1,4 +1,4 @@
-import CreateShopComponent from '@/components/modules/create-shop/create-shop-component';
+import CreateShopComponent from '@/components/modules/shop/create-shop/create-shop-component';
 
 const CreateShop = () => {
   return <CreateShopComponent />;

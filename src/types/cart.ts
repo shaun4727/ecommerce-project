@@ -1,13 +1,18 @@
-export interface ICategory {
-  _id: string;
-  name: string;
-  description: string;
-  parent: string | null;
-  isActive: boolean;
-  createdBy: string;
-  icon: string;
-  slug: string;
-  createdAt: string;
-  updatedAt: string;
-  children: ICategory[];
+export interface IOrder {
+  products: IOrderProduct[];
+  coupon?: string;
+  shippingAddress: string;
+  paymentMethod: string;
+}
+
+export interface IOrderProduct {
+  product: string;
+  quantity: number;
+  color: string;
+}
+
+export interface ICoupon {
+  shopId: string;
+  subTotal: number;
+  couponCode: string;
 }
