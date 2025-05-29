@@ -45,12 +45,13 @@ import {
   removeProduct,
   shippingAddressSelector,
   shippingCostSelector,
+  shopSelector,
   subTotalSelector,
   updateCity,
   updateShippingAddress,
 } from '@/redux/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createOrder } from '@/service/cart';
+import { addCoupon, createOrder } from '@/service/cart';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -139,6 +140,7 @@ export default function ShoppingCartSection() {
   const coupon = useAppSelector(couponSelector);
   const user = useUser();
   const router = useRouter();
+  const shopId = useAppSelector(shopSelector);
 
   const incrementQuantity = (id: string) => {
     dispatch(incrementOrderQuantity(id));
@@ -202,6 +204,27 @@ export default function ShoppingCartSection() {
     }
   };
 
+  const applyPromoCode = async () => {
+    try {
+      const couponData = {
+        orderAmount: subTotal,
+        shopId,
+        couponCode: promoCode,
+      };
+
+      console.log(couponData);
+
+      const res = await addCoupon(
+        couponData.couponCode,
+        couponData.orderAmount,
+        couponData.shopId
+      );
+      console.log(res);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
   //   const updateQuantity = (id: string, newQuantity: number) => {
   //     const applyPromoCode = () => {
   //       if (promoCode.toLowerCase() === 'save10') {
@@ -506,7 +529,7 @@ export default function ShoppingCartSection() {
                     className="flex-1"
                   />
                   <Button
-                    // onClick={applyPromoCode}
+                    onClick={applyPromoCode}
                     variant="outline"
                     className="border-blue-600 text-blue-600 hover:bg-blue-50"
                   >

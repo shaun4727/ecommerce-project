@@ -156,7 +156,7 @@ export default function UpdateProductForm({ product }: { product: IProduct }) {
 
       if (res.success) {
         toast.success(res.message);
-        router.push('/user/shop/products');
+        router.push('/admin/shop/products');
       } else {
         toast.error(res.message);
       }

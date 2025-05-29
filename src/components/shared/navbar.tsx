@@ -135,13 +135,13 @@ export default function NavbarComponent() {
               <Heart className="h-4 w-4" />
               <span>Wishlist</span>
             </a>
-            <a
-              href="#"
+            <button
+              onClick={() => router.push('/cart')}
               className="flex items-center space-x-1 hover:text-blue-200"
             >
               <ShoppingCart className="h-4 w-4" />
               <span>My Cart</span>
-            </a>
+            </button>
             <a
               href="#"
               className="flex items-center space-x-1 hover:text-blue-200"

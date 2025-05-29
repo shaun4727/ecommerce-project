@@ -24,7 +24,6 @@ import { Slider } from '@/components/ui/slider';
 import { addProduct } from '@/redux/features/cartSlice';
 import { useAppDispatch } from '@/redux/hooks';
 import { ICategory, IProduct } from '@/types';
-import { useRouter } from 'next/navigation';
 
 interface FilterCategory {
   name: string;
@@ -151,7 +150,6 @@ export default function AllProductsSection({
   const [sortBy, setSortBy] = useState('position');
   const [showItems, setShowItems] = useState('12');
   const [currentPage, setCurrentPage] = useState(1);
-  const router = useRouter();
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories((prev) =>
@@ -182,7 +180,6 @@ export default function AllProductsSection({
   const dispatch = useAppDispatch();
   const handleAddProduct = (product: IProduct) => {
     dispatch(addProduct(product));
-    router.push('/cart');
   };
 
   return (

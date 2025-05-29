@@ -29,30 +29,30 @@ const data = {
   navMain: [
     {
       title: 'Dashboard',
-      url: '/user/dashboard',
+      url: '/admin/dashboard',
       icon: SquareTerminal,
       isActive: true,
     },
     {
       title: 'Shop',
-      url: '/user/shop/products',
+      url: '/admin/shop/products',
       icon: Bot,
       items: [
         {
           title: 'Manage Products',
-          url: '/user/shop/products',
+          url: '/admin/shop/products',
         },
         {
           title: 'Manage Categories',
-          url: '/user/shop/category',
+          url: '/admin/shop/category',
         },
         {
           title: 'Manage Brands',
-          url: '/user/shop/brand',
+          url: '/admin/shop/brand',
         },
         {
           title: 'Manage Coupon',
-          url: '/user/shop/manage-coupon',
+          url: '/admin/shop/manage-coupon',
         },
       ],
     },

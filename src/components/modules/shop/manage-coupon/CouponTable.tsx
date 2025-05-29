@@ -128,7 +128,7 @@ const CouponTable = ({
             className="text-gray-500 hover:text-green-500"
             title="Edit"
             onClick={() =>
-              router.push(`/user/shop/update-product/${row.original._id}`)
+              router.push(`/admin/shop/update-product/${row.original._id}`)
             }
           >
             <Edit className="w-5 h-5" />

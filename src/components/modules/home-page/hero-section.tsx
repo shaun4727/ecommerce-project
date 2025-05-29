@@ -12,35 +12,36 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 const heroSlides = [
   {
     id: 1,
-    topText: 'TOP BRANDS',
+    topText: 'SONY',
     title: 'NEW COLLECTIONS',
-    subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    image: '/images/hero-vegetables.png',
+    subtitle: 'High-quality wireless noise-cancelling headphones.',
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
     buttonText: 'SHOP NOW',
-    buttonLink: '/shop',
+    buttonLink: '/products',
   },
   {
     id: 2,
-    topText: 'FRESH ORGANIC',
-    title: 'HEALTHY CHOICES',
-    subtitle:
-      'Discover our premium selection of organic vegetables and fruits.',
-    image: '/placeholder.svg?height=400&width=800',
-    buttonText: 'EXPLORE',
-    buttonLink: '/organic',
+    topText: 'APPLE',
+    title: 'ELECTRONIC DEVICE',
+    subtitle: 'Sleek and powerful smartphone with advanced camera.',
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
+    buttonText: 'SHOP NOW',
+    buttonLink: '/products',
   },
   {
     id: 3,
-    topText: 'SEASONAL OFFERS',
+    topText: 'NIKE',
     title: 'SUMMER SPECIALS',
-    subtitle: 'Get the best deals on fresh produce this season.',
-    image: '/placeholder.svg?height=400&width=800',
-    buttonText: 'VIEW DEALS',
-    buttonLink: '/deals',
+    subtitle: 'Comfortable and stylish running shoes.',
+    image:
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    buttonText: 'SHOP NOW',
+    buttonLink: '/products',
   },
 ];
 
@@ -113,12 +114,14 @@ export default function HeroSection() {
             </p>
 
             {/* CTA Button */}
-            <Button
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-md font-semibold rounded-md transition-colors duration-200"
-            >
-              {currentHero.buttonText}
-            </Button>
+            <Link href="/products">
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-md font-semibold rounded-md transition-colors duration-200"
+              >
+                {currentHero.buttonText}
+              </Button>
+            </Link>
           </div>
         </div>
 

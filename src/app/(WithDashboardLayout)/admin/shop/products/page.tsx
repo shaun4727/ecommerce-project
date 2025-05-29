@@ -6,10 +6,10 @@ const ManageProductsPage = async ({
 }: {
   searchParams: Promise<{ page: string }>;
 }) => {
-  const { page } = await searchParams;
+  const { page = '1' } = await searchParams;
 
-  const { data, meta } = await getAllProducts(page, '3');
-  console.log(data, meta);
+  const { data, meta } = await getAllProducts(page, '10');
+
   return (
     <div>
       <ManageProducts products={data} meta={meta} />

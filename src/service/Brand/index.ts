@@ -59,3 +59,15 @@ export const deleteBrand = async (brandId: string): Promise<any> => {
     return Error(error);
   }
 };
+
+export const homePageBrandWithProduct = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/brand/brands-with-product`
+    );
+
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};

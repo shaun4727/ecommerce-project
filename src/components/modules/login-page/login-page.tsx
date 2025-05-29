@@ -41,7 +41,10 @@ const LoginPageComponent = () => {
 
   const setCredentialMethod = (type: string) => {
     if (type === 'user') {
-      setValue('email', 'alex@gmail.com');
+      setValue('email', 'shaun.mononsoft@gmail.com');
+      setValue('password', 'password');
+    } else {
+      setValue('email', 'admin@gmail.com');
       setValue('password', 'password');
     }
   };
@@ -114,6 +117,7 @@ const LoginPageComponent = () => {
               Sign In with User
             </Button>
             <Button
+              onClick={() => setCredentialMethod('admin')}
               variant="default"
               className="bg-cyan-400 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 py-3"
             >

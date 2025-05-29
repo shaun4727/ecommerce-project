@@ -1,5 +1,6 @@
 'use client';
 
+import { IBrand } from '@/types';
 import CategorySection from './category-section';
 import FeaturedProducts from './featured-products';
 import FlashSale from './flash-sale';
@@ -7,11 +8,11 @@ import FlashSale from './flash-sale';
 import HeroSection from './hero-section';
 import TopBrands from './TopBrands';
 
-const HomePageComponent = () => {
+const HomePageComponent = ({ data }: { data: IBrand[] }) => {
   return (
     <>
       <HeroSection />
-      <CategorySection />
+      <CategorySection data={data} />
       <FeaturedProducts />
       <FlashSale />
       <TopBrands />

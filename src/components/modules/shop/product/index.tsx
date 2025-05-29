@@ -97,14 +97,16 @@ const ManageProducts = ({
     {
       accessorKey: 'price',
       header: 'Price',
-      cell: ({ row }) => <span>$ {row.original.price.toFixed(2)}</span>,
+      cell: ({ row }) => <span> {Number(row.original.price).toFixed(2)}</span>,
     },
     {
       accessorKey: 'offerPrice',
       header: 'Ofter Price',
       cell: ({ row }) => (
         <span>
-          $ {row.original.offerPrice ? row.original.offerPrice.toFixed(2) : '0'}
+          {row.original.offerPrice
+            ? Number(row.original.offerPrice).toFixed(2)
+            : '0'}
         </span>
       ),
     },
@@ -126,7 +128,7 @@ const ManageProducts = ({
             title="Edit"
             onClick={() =>
               router.push(
-                `/user/shop/products/update-product/${row.original._id}`
+                `/admin/shop/products/update-product/${row.original._id}`
               )
             }
           >
@@ -151,7 +153,7 @@ const ManageProducts = ({
         <h1 className="text-xl font-bold">Manage Products</h1>
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => router.push('/user/shop/products/add-product')}
+            onClick={() => router.push('/admin/shop/products/add-product')}
             size="sm"
           >
             Add Product <Plus />

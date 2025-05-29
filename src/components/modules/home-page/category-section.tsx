@@ -15,6 +15,8 @@ import {
 import Link from 'next/link';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { IBrand } from '@/types';
+import Image from 'next/image';
 
 interface Category {
   id: string;
@@ -83,7 +85,7 @@ const categories: Category[] = [
   },
 ];
 
-export default function CategorySection() {
+export default function CategorySection({ data }: { data: IBrand[] }) {
   return (
     <div className="w-full bg-gray-50 py-12">
       <div className="container mx-auto px-4">
@@ -101,16 +103,16 @@ export default function CategorySection() {
         <div className="relative">
           {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 xl:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <CategoryCard key={category.id} category={category} />
+            {data?.map((category) => (
+              <CategoryCard key={category._id} category={category} />
             ))}
           </div>
 
           {/* Mobile Horizontal Scroll */}
           <div className="md:hidden">
             <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-              {categories.map((category) => (
-                <div key={category.id} className="flex-shrink-0">
+              {data?.map((category) => (
+                <div key={category._id} className="flex-shrink-0">
                   <CategoryCard category={category} />
                 </div>
               ))}
@@ -124,16 +126,23 @@ export default function CategorySection() {
   );
 }
 
-function CategoryCard({ category }: { category: Category }) {
+function CategoryCard({ category }: { category: IBrand }) {
   return (
-    <Link href={category.href} className="group">
+    <Link href={`/products`} className="group">
       <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-white group-hover:scale-105">
         <CardContent className="p-6 text-center">
           {/* Icon Container */}
           <div className="w-16 h-16 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
-            <div className="text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
-              {category.icon}
-            </div>
+            {/* <div className="text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
+              {category.logo}
+            </div> */}
+
+            <Image
+              src={category.logo || '/placeholder.svg'}
+              alt={category.name}
+              width={200}
+              height={200}
+            />
           </div>
 
           {/* Category Name */}
@@ -142,8 +151,8 @@ function CategoryCard({ category }: { category: Category }) {
           </h3>
 
           {/* Item Count */}
-          {category.count && (
-            <p className="text-sm text-gray-500">{category.count} items</p>
+          {category.createdBy && (
+            <p className="text-sm text-gray-500">{category.createdBy}</p>
           )}
         </CardContent>
       </Card>
