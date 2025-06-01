@@ -2,11 +2,12 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { IBrandWithProducts } from '@/types';
+import { useRouter } from 'next/navigation';
 
 interface Brand {
   id: string;
@@ -104,58 +105,62 @@ const topBrands: Brand[] = [
   },
 ];
 
-function BrandCard({ brand }: { brand: Brand }) {
+function BrandCard({ brand }: { brand: IBrandWithProducts }) {
+  const router = useRouter();
+
+  const getProductsWithBrand = () => {
+    router.push(`/products?brands=${brand._id}`);
+  };
+
   return (
-    <Link href={brand.href} className="group">
-      <Card className="h-full hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-blue-300 bg-white group-hover:scale-105">
-        <CardContent className="p-6 text-center h-full flex flex-col justify-between">
-          {/* Brand Logo */}
-          <div className="mb-4">
-            <div className="w-24 h-16 mx-auto bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-blue-50 transition-colors duration-200">
-              <Image
-                src={brand.logo || '/placeholder.svg'}
-                alt={`${brand.name} logo`}
-                width={80}
-                height={60}
-                className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-              />
-            </div>
+    <Card
+      onClick={getProductsWithBrand}
+      className="h-full hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-blue-300 bg-white group-hover:scale-105"
+    >
+      <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+        {/* Brand Logo */}
+        <div className="mb-4">
+          <div className="w-24 h-16 mx-auto bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-blue-50 transition-colors duration-200">
+            <Image
+              src={brand.logo || '/placeholder.svg'}
+              alt={`${brand.name} logo`}
+              width={80}
+              height={60}
+              className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+            />
           </div>
+        </div>
 
-          {/* Brand Info */}
-          <div className="flex-1">
-            <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-              {brand.name}
-            </h3>
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-              {brand.description}
-            </p>
-            <div className="text-xs text-blue-600 font-medium">
-              {brand.productCount.toLocaleString()} Products
-            </div>
+        {/* Brand Info */}
+        <div className="flex-1">
+          <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+            {brand.name}
+          </h3>
+          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+            A brand promised to provide better products
+          </p>
+          <div className="text-xs text-blue-600 font-medium">
+            {brand.products.length} Products
           </div>
-
-          {/* Featured Badge */}
-          {brand.featured && (
-            <div className="absolute top-3 right-3">
-              <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium">
-                Featured
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-export default function TopBrands() {
+export default function TopBrands({
+  allBrands,
+}: {
+  allBrands: IBrandWithProducts[];
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerView = {
     mobile: 2,
     tablet: 3,
     desktop: 5,
   };
+
+  const router = useRouter();
 
   const nextSlide = () => {
     setCurrentIndex(
@@ -170,6 +175,10 @@ export default function TopBrands() {
         (prev - 1 + Math.max(1, topBrands.length - itemsPerView.desktop + 1)) %
         Math.max(1, topBrands.length - itemsPerView.desktop + 1)
     );
+  };
+
+  const getProductsFromBrand = (product: IBrandWithProducts) => {
+    router.push(`/products?brands=${product._id}`);
   };
 
   return (
@@ -219,8 +228,8 @@ export default function TopBrands() {
                 transform: `translateX(-${currentIndex * (100 / itemsPerView.desktop)}%)`,
               }}
             >
-              {topBrands.map((brand) => (
-                <div key={brand.id} className="w-1/5 flex-shrink-0 px-3">
+              {allBrands?.map((brand) => (
+                <div key={brand._id} className="w-1/5 flex-shrink-0 px-3">
                   <BrandCard brand={brand} />
                 </div>
               ))}
@@ -229,42 +238,42 @@ export default function TopBrands() {
 
           {/* Tablet Grid */}
           <div className="hidden md:grid lg:hidden grid-cols-3 gap-6">
-            {topBrands.slice(0, 6).map((brand) => (
-              <BrandCard key={brand.id} brand={brand} />
-            ))}
+            {allBrands
+              ?.slice(0, 6)
+              .map((brand) => <BrandCard key={brand._id} brand={brand} />)}
           </div>
 
           {/* Mobile Grid */}
           <div className="md:hidden grid grid-cols-2 gap-4">
-            {topBrands.slice(0, 4).map((brand) => (
-              <BrandCard key={brand.id} brand={brand} />
-            ))}
+            {allBrands
+              ?.slice(0, 4)
+              .map((brand) => <BrandCard key={brand._id} brand={brand} />)}
           </div>
         </div>
 
         {/* Featured Brands Section */}
         <div className="mt-16">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
             Featured Brand Partners
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {topBrands
-              .filter((brand) => brand.featured)
-              .map((brand) => (
-                <Link key={brand.id} href={brand.href} className="group">
-                  <div className="bg-white rounded-lg p-6 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 group-hover:scale-105">
-                    <div className="aspect-square flex items-center justify-center">
-                      <Image
-                        src={brand.logo || '/placeholder.svg'}
-                        alt={`${brand.name} logo`}
-                        width={60}
-                        height={45}
-                        className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-                      />
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            {allBrands?.map((brand, index) => (
+              <div
+                key={index}
+                onClick={() => getProductsFromBrand(brand)}
+                className="bg-white rounded-lg p-6 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 group-hover:scale-105"
+              >
+                <div className="aspect-square flex items-center justify-center">
+                  <Image
+                    src={brand.logo || '/placeholder.svg'}
+                    alt={`${brand.name} logo`}
+                    width={60}
+                    height={45}
+                    className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -296,14 +305,14 @@ export default function TopBrands() {
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-8">
+        {/* <div className="text-center mt-8">
           <Button
             size="lg"
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md transition-colors duration-200"
           >
             View All Brands
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

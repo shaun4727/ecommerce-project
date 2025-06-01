@@ -31,25 +31,31 @@ import {
 } from '@/components/ui/select';
 
 import { cn } from '@/lib/utils';
+import { createCouponApi } from '@/service/cart';
 import { format, formatISO } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export default function CreateCouponModal() {
   const form = useForm();
   const startDate = form.watch('startDate');
   const discountType = form.watch('discountType');
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const couponData = {
       ...data,
       startDate: formatISO(data.startDate),
       endDate: formatISO(data.endDate),
     };
-
-    console.log(couponData);
-
-    form.reset();
+    const toastId = toast.loading('...Loading');
+    const res = await createCouponApi(couponData);
+    if (res?.success) {
+      form.reset();
+      toast.success(res.message, { id: toastId });
+    } else {
+      console.log(res.message);
+    }
   };
   return (
     <Dialog>
@@ -80,13 +86,13 @@ export default function CreateCouponModal() {
             />
             <FormField
               control={form.control}
-              name="email"
+              name="discountType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Discount Type</FormLabel>
                   <Select
+                    value={field.value || ''}
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -94,8 +100,8 @@ export default function CreateCouponModal() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="flat">Flat</SelectItem>
+                      <SelectItem value="Percentage">Percentage</SelectItem>
+                      <SelectItem value="Flat">Flat</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>

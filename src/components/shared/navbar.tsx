@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input';
 import { protectedRoutes } from '@/constants';
 import { useUser } from '@/context/UserContext';
 import { logout } from '@/service/AuthService';
+import { getAllCategories } from '@/service/Category';
+import { IBrand, ICategory } from '@/types';
 import {
   ChevronDown,
   CreditCard,
@@ -30,50 +32,38 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
 import MobileSidebarNav from './responsive-sidebar-menu';
 
 const megaMenuCategories = {
-  Men: [
-    'Dresses',
-    'Shoes',
-    'Jackets',
-    'Sunglasses',
-    'Sport Wear',
-    'Blazers',
-    'Shirts',
+  'Home Accessories': [
+    { name: 'Bedding', id: '683770a6e4003a6d8ae07ad8' },
+    { name: 'Furniture', id: '683770a6e4003a6d8ae07ad9' },
+    { name: 'Wall Art', id: '683770a6e4003a6d8ae07adb' },
+    { name: 'Lighting & Ceiling Fans', id: '683770a6e4003a6d8ae07ada' },
   ],
-  Women: [
-    'Handbags',
-    'Jewellery',
-    'Swimwear',
-    'Tops',
-    'Flats',
-    'Shoes',
-    'Winter Wear',
+  Computer: [
+    { name: 'Computer Accessories', id: '6837702fe4003a6d8ae07ad4' },
+    { name: 'Monitors', id: '6837702fe4003a6d8ae07ad7' },
+    { name: 'Components', id: '6837702fe4003a6d8ae07ad5' },
+    { name: 'Laptop', id: '683800cd2e9873a563dc4586' },
   ],
-  Boys: [
-    'Toys & Games',
-    'Jeans',
-    'Shirts',
-    'Shoes',
-    'School Bags',
-    'Lunch Box',
-    'Footwear',
+  'Mobile Accessories': [
+    { name: 'Headphones', id: '68376f2de4003a6d8ae07acf' },
+    { name: 'Cell Phones', id: '68376f2de4003a6d8ae07ace' },
+    { name: 'Tablets', id: '6837702fe4003a6d8ae07ad6' },
+    { name: 'Accessories & Supplies', id: '68376f2de4003a6d8ae07acc' },
   ],
-  Girls: [
-    'Sandals',
-    'Shorts',
-    'Dresses',
-    'Jewellery',
-    'Bags',
-    'Night Dress',
-    'Swim Wear',
+  'Bags & Others': [
+    { name: 'Backpacks', id: '683770ece4003a6d8ae07add' },
+    { name: 'Suitcases', id: '683770ece4003a6d8ae07adf' },
+    { name: 'Travel Totes', id: '683770ece4003a6d8ae07ade' },
+    { name: 'Carry Ons', id: '683770ece4003a6d8ae07adc' },
   ],
 };
 
 export default function NavbarComponent() {
   const [isClothingOpen, setIsClothingOpen] = useState(false);
+  const [allCategories, setAllCategories] = useState<IBrand[]>([]);
 
   const { user, setIsLoading } = useUser();
 
@@ -82,12 +72,33 @@ export default function NavbarComponent() {
 
   useEffect(() => {
     setIsLoading(true);
+    getCategoriesMethod();
   }, []);
   const handleLogout = () => {
     logout();
     setIsLoading(true);
     if (protectedRoutes.some((route) => pathname.match(route))) {
       router.push('/');
+    }
+  };
+
+  const getCategoriesMethod = async () => {
+    try {
+      const res = await getAllCategories();
+      const navs = [
+        '683ae03cedd553ace12e63de',
+        '683ae018edd553ace12e63d9',
+        '683adfa8edd553ace12e63d4',
+      ];
+
+      if (res?.success) {
+        const filteredCategories = res.data?.filter((category: ICategory) =>
+          navs.includes(category._id)
+        );
+        setAllCategories(filteredCategories);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -99,7 +110,7 @@ export default function NavbarComponent() {
           <div className="flex items-center space-x-4">
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center space-x-1 hover:text-blue-200">
-                <span>USD</span>
+                <span>BDT</span>
                 <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -166,7 +177,7 @@ export default function NavbarComponent() {
         <div className="flex flex-col gap-3 items-center lg:flex-row lg:justify-center lg:py-4  ">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-yellow-400">Flipmart</h1>
+            <h1 className="text-2xl font-bold text-yellow-400">Emart</h1>
           </div>
 
           <div className="flex-1 max-w-2xl mx-8">
@@ -217,57 +228,25 @@ export default function NavbarComponent() {
                     onMouseEnter={() => setIsClothingOpen(true)}
                     onMouseLeave={() => setIsClothingOpen(false)}
                   >
-                    <span>CLOTHING</span>
+                    <span>ELECTRONIC &amp; OTHERS</span>
                     <ChevronDown className="w-4 h-4" />
                   </button>
                 </div>
-
-                <div className="flex items-center space-x-1">
-                  <Link
-                    href="/electronics"
-                    className="text-sm font-medium hover:text-blue-200 transition-colors"
-                  >
-                    ELECTRONICS
-                  </Link>
-                  <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5 ml-1">
-                    HOT
-                  </Badge>
-                </div>
-
-                <Link
-                  href="/health-beauty"
-                  className="text-sm font-medium hover:text-blue-200 transition-colors"
-                >
-                  HEALTH & BEAUTY
-                </Link>
-
-                <Link
-                  href="/watches"
-                  className="text-sm font-medium hover:text-blue-200 transition-colors"
-                >
-                  WATCHES
-                </Link>
-
-                <Link
-                  href="/jewellery"
-                  className="text-sm font-medium hover:text-blue-200 transition-colors"
-                >
-                  JEWELLERY
-                </Link>
-
-                <Link
-                  href="/shoes"
-                  className="text-sm font-medium hover:text-blue-200 transition-colors"
-                >
-                  SHOES
-                </Link>
-
-                <Link
-                  href="/kids-girls"
-                  className="text-sm font-medium hover:text-blue-200 transition-colors"
-                >
-                  KIDS & GIRLS
-                </Link>
+                {allCategories &&
+                  allCategories?.map((category) => (
+                    <div key={category?._id}>
+                      {' '}
+                      <Link
+                        //   href="/products?category=watches"
+                        href={`/products?category=${category?._id}`}
+                        className="text-sm font-medium hover:text-blue-200 transition-colors"
+                      >
+                        <span style={{ textTransform: 'uppercase' }}>
+                          {category?.name ?? category?.name}
+                        </span>
+                      </Link>
+                    </div>
+                  ))}
 
                 <Link
                   href="/create-shop"
@@ -339,12 +318,12 @@ export default function NavbarComponent() {
                     </h3>
                     <ul className="space-y-2">
                       {items.map((item) => (
-                        <li key={item}>
+                        <li key={item.id}>
                           <Link
-                            href={`/${category.toLowerCase()}/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                            href={`/products?category=${item?.id}`}
                             className="text-gray-600 hover:text-blue-600 transition-colors text-sm"
                           >
-                            {item}
+                            {item?.name}
                           </Link>
                         </li>
                       ))}

@@ -14,7 +14,7 @@ export const registerUserApi = async (userData: Record<string, unknown>) => {
     });
 
     const result = await res.json();
-    // console.log(result);
+
     return result;
   } catch (error: any) {
     return Error(error);
@@ -40,7 +40,7 @@ export const loginUserApi = async (userData: Record<string, unknown>) => {
         result?.data?.refreshToken
       );
     }
-    // console.log(result);
+
     return result;
   } catch (error: any) {
     return Error(error);

@@ -24,6 +24,7 @@ import { Slider } from '@/components/ui/slider';
 import { addProduct } from '@/redux/features/cartSlice';
 import { useAppDispatch } from '@/redux/hooks';
 import { ICategory, IProduct } from '@/types';
+import { useRouter } from 'next/navigation';
 
 interface FilterCategory {
   name: string;
@@ -135,6 +136,7 @@ type productsWithId = IProduct & {
 type categoryWithId = ICategory & {
   _id: string;
 };
+
 export default function AllProductsSection({
   products,
   category,
@@ -150,6 +152,7 @@ export default function AllProductsSection({
   const [sortBy, setSortBy] = useState('position');
   const [showItems, setShowItems] = useState('12');
   const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories((prev) =>
@@ -180,6 +183,10 @@ export default function AllProductsSection({
   const dispatch = useAppDispatch();
   const handleAddProduct = (product: IProduct) => {
     dispatch(addProduct(product));
+  };
+
+  const getDetailOfTheProduct = (product: IProduct) => {
+    router.push(`/products/${product._id}`);
   };
 
   return (
@@ -397,12 +404,12 @@ export default function AllProductsSection({
             {/* Promotional Banner */}
             <div className="relative h-64 md:h-80 mb-8 rounded-lg overflow-hidden">
               <Image
-                src="/placeholder.svg?height=320&width=800"
+                src="/images/big-sale.jpg"
                 alt="Big Sale Banner"
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-black/60" />
               <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white">
                 <h1 className="text-4xl md:text-6xl font-bold text-yellow-400 mb-4">
                   BIG SALE
@@ -411,7 +418,7 @@ export default function AllProductsSection({
                   Save up to 49% off
                 </h2>
                 <p className="text-lg opacity-90 max-w-md">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                  Let us help you with the best products
                 </p>
               </div>
             </div>
@@ -486,68 +493,73 @@ export default function AllProductsSection({
                   : 'space-y-4'
               }
             >
-              {products.map((product) => (
-                <Card
-                  key={product._id}
-                  className="hover:shadow-lg transition-shadow duration-200"
-                >
-                  <CardContent
-                    className={
-                      viewMode === 'grid' ? 'p-4' : 'p-4 flex space-x-4'
-                    }
+              {products &&
+                products.map((product) => (
+                  <Card
+                    key={product._id}
+                    onClick={() => getDetailOfTheProduct(product)}
+                    className="hover:shadow-lg transition-shadow duration-200"
                   >
-                    <div
+                    <CardContent
                       className={
-                        viewMode === 'grid' ? '' : 'w-32 h-32 flex-shrink-0'
+                        viewMode === 'grid' ? 'p-4' : 'p-4 flex space-x-4'
                       }
                     >
                       <div
-                        className={`relative bg-gray-100 rounded-lg overflow-hidden ${viewMode === 'grid' ? 'aspect-square mb-4' : 'w-full h-full'}`}
+                        className={
+                          viewMode === 'grid' ? '' : 'w-32 h-32 flex-shrink-0'
+                        }
                       >
-                        <Image
-                          src={
-                            product.imageUrls[0] ||
-                            '"https://psediting.websites.co.in/obaju-turquoise/img/product-placeholder.png"'
-                          }
-                          alt="product-img"
-                          fill
-                          className="object-cover"
-                        />
+                        <div
+                          className={`relative bg-gray-100 rounded-lg overflow-hidden ${viewMode === 'grid' ? 'aspect-square mb-4' : 'w-full h-full'}`}
+                        >
+                          <Image
+                            src={product?.imageUrls?.[0]}
+                            alt="product-img"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className={viewMode === 'grid' ? '' : 'flex-1'}>
-                      <h3 className="font-semibold text-gray-900 mb-2">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-2">
-                        {product.brand.name}
-                      </p>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-lg font-bold text-blue-600">
-                          ${product.price}
-                        </span>
-                        {product.offerPrice && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ${product.offerPrice}
+                      <div
+                        className={
+                          viewMode === 'grid'
+                            ? 'relative h-48'
+                            : 'flex-1 relative'
+                        }
+                      >
+                        <h3 className="font-semibold text-gray-900 mb-2">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-2">
+                          {product.brand.name}
+                        </p>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="text-lg font-bold text-blue-600">
+                            ${product.price}
                           </span>
-                        )}
+                          {product.offerPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ${product.offerPrice}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-1 min-h-3 mb-3">
+                          <StarRating rating={product.ratingCount} />
+                          <span className="text-sm text-gray-500">
+                            ({product.description})
+                          </span>
+                        </div>
+                        <Button
+                          onClick={() => handleAddProduct(product)}
+                          className="w-full bottom-0 bg-blue-600 hover:bg-blue-700 text-white absolute"
+                        >
+                          Add to Cart
+                        </Button>
                       </div>
-                      <div className="flex items-center space-x-1 mb-3">
-                        <StarRating rating={product.ratingCount} />
-                        <span className="text-sm text-gray-500">
-                          ({product.description})
-                        </span>
-                      </div>
-                      <Button
-                        onClick={() => handleAddProduct(product)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
 
             {/* Pagination */}

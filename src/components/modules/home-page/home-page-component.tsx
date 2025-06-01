@@ -1,6 +1,6 @@
 'use client';
 
-import { IBrand } from '@/types';
+import { IBrand, IProduct } from '@/types';
 import CategorySection from './category-section';
 import FeaturedProducts from './featured-products';
 import FlashSale from './flash-sale';
@@ -8,14 +8,24 @@ import FlashSale from './flash-sale';
 import HeroSection from './hero-section';
 import TopBrands from './TopBrands';
 
-const HomePageComponent = ({ data }: { data: IBrand[] }) => {
+const HomePageComponent = ({
+  data,
+  trendingProducts,
+  flashSaleProducts,
+  allBrands,
+}: {
+  data: IBrand[];
+  allBrands: IBrand[];
+  trendingProducts: IProduct[];
+  flashSaleProducts: IProduct[];
+}) => {
   return (
     <>
       <HeroSection />
       <CategorySection data={data} />
-      <FeaturedProducts />
-      <FlashSale />
-      <TopBrands />
+      <FeaturedProducts trendingProducts={trendingProducts} />
+      <FlashSale flashSaleProducts={flashSaleProducts} />
+      <TopBrands allBrands={allBrands} />
     </>
   );
 };

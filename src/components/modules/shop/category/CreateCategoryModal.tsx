@@ -35,7 +35,6 @@ const CreateCategoryModal = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      console.log(data);
       const formData = new FormData();
       formData.append('data', JSON.stringify(data));
       formData.append('icon', imageFiles[0] as File);

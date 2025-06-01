@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { IBrand } from '@/types';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Category {
   id: string;
@@ -86,6 +87,12 @@ const categories: Category[] = [
 ];
 
 export default function CategorySection({ data }: { data: IBrand[] }) {
+  const router = useRouter();
+
+  const viewBrandProduct = (category: IBrand) => {
+    router.push(`/products?brands=${category._id}`);
+  };
+
   return (
     <div className="w-full bg-gray-50 py-12">
       <div className="container mx-auto px-4">
@@ -104,7 +111,12 @@ export default function CategorySection({ data }: { data: IBrand[] }) {
           {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 xl:grid-cols-4 gap-6">
             {data?.map((category) => (
-              <CategoryCard key={category._id} category={category} />
+              <div
+                onClick={() => viewBrandProduct(category)}
+                key={category._id}
+              >
+                <CategoryCard key={category._id} category={category} />
+              </div>
             ))}
           </div>
 
@@ -132,7 +144,7 @@ function CategoryCard({ category }: { category: IBrand }) {
       <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-white group-hover:scale-105">
         <CardContent className="p-6 text-center">
           {/* Icon Container */}
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
+          <div className="w-24 h-24 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
             {/* <div className="text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
               {category.logo}
             </div> */}
@@ -142,6 +154,7 @@ function CategoryCard({ category }: { category: IBrand }) {
               alt={category.name}
               width={200}
               height={200}
+              className="w-12"
             />
           </div>
 
@@ -151,9 +164,9 @@ function CategoryCard({ category }: { category: IBrand }) {
           </h3>
 
           {/* Item Count */}
-          {category.createdBy && (
+          {/* {category.createdBy && (
             <p className="text-sm text-gray-500">{category.createdBy}</p>
-          )}
+          )} */}
         </CardContent>
       </Card>
     </Link>

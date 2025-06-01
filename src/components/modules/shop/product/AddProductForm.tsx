@@ -90,8 +90,6 @@ export default function AddProductsForm() {
     appendSpec({ key: '', value: '' });
   };
 
-  // console.log(specFields);
-
   useEffect(() => {
     const fetchData = async () => {
       const [categoriesData, brandsData] = await Promise.all([
@@ -121,8 +119,6 @@ export default function AddProductsForm() {
         (specification[item.key] = item.value)
     );
 
-    // console.log({ availableColors, keyFeatures, specification });
-
     const modifiedData = {
       ...data,
       availableColors,
@@ -141,7 +137,7 @@ export default function AddProductsForm() {
     }
     try {
       const res = await addProduct(formData);
-      console.log(res);
+
       if (res.success) {
         toast.success(res.message);
         router.push('/admin/shop/products');

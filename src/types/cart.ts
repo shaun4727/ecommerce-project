@@ -16,3 +16,15 @@ export interface ICoupon {
   subTotal: number;
   couponCode: string;
 }
+
+export interface ICouponData {
+  code: string;
+  createdAt: Date;
+  discountType: 'Percentage' | 'Flat';
+  discountValue: number;
+  endDate: Date;
+  isActive: boolean;
+  isDeleted: boolean;
+  maxDiscountAmount: number;
+  minOrderAmount: number;
+}

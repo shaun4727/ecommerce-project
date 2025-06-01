@@ -4,10 +4,11 @@ import { getSingleProduct } from '@/service/Product';
 const ProductDetailPage = async ({
   params,
 }: {
-  params: Promise<{ productId: string }>;
+  params: Promise<{ id: string }>;
 }) => {
-  const { productId } = await params;
-  const { data: product } = await getSingleProduct(productId);
+  const { id } = await params;
+  const { data: product } = await getSingleProduct(id);
+
   return <ProductDetail product={product} />;
 };
 

@@ -74,8 +74,6 @@ export default function CreateShopComponent() {
       formData.append('logo', imageFiles[0]);
       const res = await createShopService(formData);
 
-      console.log(res);
-
       if (res.success) {
         reset();
         setImagePreview([]);

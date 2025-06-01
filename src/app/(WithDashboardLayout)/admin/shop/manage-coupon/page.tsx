@@ -1,7 +1,12 @@
 import CouponTable from '@/components/modules/shop/manage-coupon/CouponTable';
 import CreateCouponModal from '@/components/modules/shop/manage-coupon/CreateCouponModal';
+import { getAllCouponApi } from '@/service/cart';
 
-export default function ManageCouponPage() {
+export default async function ManageCouponPage() {
+  const {
+    data: { meta, result },
+  } = await getAllCouponApi();
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -9,10 +14,7 @@ export default function ManageCouponPage() {
         <CreateCouponModal />
       </div>
       <div>
-        <CouponTable
-          coupons={[]}
-          meta={{ page: 1, limit: 10, total: 100, totalPage: 10 }}
-        />
+        <CouponTable coupons={result} meta={meta} />
       </div>
     </div>
   );

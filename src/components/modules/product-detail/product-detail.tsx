@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Heart,
   Minus,
   Plus,
   RotateCcw,
@@ -12,7 +11,7 @@ import {
   Truck,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,104 +21,9 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { addProduct } from '@/redux/features/cartSlice';
 import { useAppDispatch } from '@/redux/hooks';
+import { getAllProducts } from '@/service/Product';
 import { IProduct } from '@/types';
-
-interface ProductImage {
-  id: string;
-  url: string;
-  alt: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  rating: number;
-  reviewCount: number;
-  availability: 'In Stock' | 'Out of Stock' | 'Limited Stock';
-  description: string;
-  images: ProductImage[];
-  category: string;
-  brand: string;
-  sku: string;
-}
-
-const productData: Product = {
-  id: '1',
-  name: 'Floral Print Buttoned',
-  price: 800.0,
-  originalPrice: 900.0,
-  rating: 4,
-  reviewCount: 13,
-  availability: 'In Stock',
-  description:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  images: [
-    {
-      id: '1',
-      url: '/placeholder.svg?height=500&width=500',
-      alt: 'Floral Print Buttoned - Main View',
-    },
-    {
-      id: '2',
-      url: '/placeholder.svg?height=500&width=500',
-      alt: 'Floral Print Buttoned - Side View',
-    },
-    {
-      id: '3',
-      url: '/placeholder.svg?height=500&width=500',
-      alt: 'Floral Print Buttoned - Back View',
-    },
-    {
-      id: '4',
-      url: '/placeholder.svg?height=500&width=500',
-      alt: 'Floral Print Buttoned - Detail View',
-    },
-  ],
-  category: 'Clothing',
-  brand: 'Fashion Brand',
-  sku: 'FB-001',
-};
-
-const similarProducts = [
-  {
-    id: '2',
-    name: 'Summer Floral Dress',
-    price: 650.0,
-    originalPrice: 750.0,
-    image: '/placeholder.svg?height=300&width=300',
-    rating: 4.5,
-    reviews: 89,
-  },
-  {
-    id: '3',
-    name: 'Casual Button Shirt',
-    price: 450.0,
-    originalPrice: 550.0,
-    image: '/placeholder.svg?height=300&width=300',
-    rating: 4.2,
-    reviews: 156,
-  },
-  {
-    id: '4',
-    name: 'Printed Blouse',
-    price: 380.0,
-    originalPrice: 480.0,
-    image: '/placeholder.svg?height=300&width=300',
-    rating: 4.7,
-    reviews: 203,
-  },
-  {
-    id: '5',
-    name: 'Elegant Floral Top',
-    price: 520.0,
-    originalPrice: 620.0,
-    image: '/placeholder.svg?height=300&width=300',
-    rating: 4.4,
-    reviews: 94,
-  },
-];
+import { useRouter } from 'next/navigation';
 
 function StarRating({
   rating,
@@ -143,7 +47,7 @@ function StarRating({
   );
 }
 
-function ProductGallery({ images }: { images: ProductImage[] }) {
+function ProductGallery({ images }: { images: string[] }) {
   const [selectedImage, setSelectedImage] = useState(0);
 
   return (
@@ -151,8 +55,8 @@ function ProductGallery({ images }: { images: ProductImage[] }) {
       {/* Main Image */}
       <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
         <Image
-          src={images[selectedImage]?.url || '/placeholder.svg'}
-          alt={images[selectedImage]?.alt || 'Product Image'}
+          src={images[selectedImage]}
+          alt={'Product Image'}
           width={500}
           height={500}
           className="w-full h-full object-cover"
@@ -163,7 +67,7 @@ function ProductGallery({ images }: { images: ProductImage[] }) {
       <div className="flex space-x-2">
         {images.map((image, index) => (
           <button
-            key={image.id}
+            key={index}
             onClick={() => setSelectedImage(index)}
             className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
               selectedImage === index
@@ -172,8 +76,8 @@ function ProductGallery({ images }: { images: ProductImage[] }) {
             }`}
           >
             <Image
-              src={image.url || '/placeholder.svg'}
-              alt={image.alt}
+              src={image}
+              alt={`product-image`}
               width={80}
               height={80}
               className="w-full h-full object-cover"
@@ -200,48 +104,50 @@ function ProductGallery({ images }: { images: ProductImage[] }) {
   );
 }
 
-function SimilarProducts() {
+function SimilarProducts({ similarProduct }: { similarProduct: IProduct[] }) {
+  const router = useRouter();
+  const getProductDetail = (product: IProduct) => {
+    router.push(`/products/${product._id}`);
+  };
   return (
     <div className="mt-16">
       <h3 className="text-2xl font-bold text-gray-900 mb-6">
         Similar Products
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {similarProducts.map((product) => (
+        {similarProduct.map((product) => (
           <Card
-            key={product.id}
+            key={product._id}
+            onClick={() => getProductDetail(product)}
             className="group hover:shadow-lg transition-all duration-300"
           >
             <CardContent className="p-4">
               <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
                 <Image
-                  src={product.image || '/placeholder.svg'}
-                  alt={product.name}
+                  src={product.imageUrls[0]}
+                  alt={`product-image`}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   className="absolute top-2 right-2 bg-white/80 hover:bg-white rounded-full"
                 >
                   <Heart className="h-4 w-4" />
-                </Button>
+                </Button> */}
               </div>
               <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                 {product.name}
               </h4>
-              <StarRating
-                rating={product.rating}
-                reviewCount={product.reviews}
-              />
+              <StarRating rating={3} reviewCount={4} />
               <div className="flex items-center space-x-2 mt-2">
                 <span className="text-lg font-bold text-blue-600">
-                  ${product.price.toFixed(2)}
+                  ${product?.price}
                 </span>
-                <span className="text-sm text-gray-500 line-through">
-                  ${product.originalPrice.toFixed(2)}
-                </span>
+                {/* <span className="text-sm text-gray-500 line-through">
+                  ${product?.price}
+                </span> */}
               </div>
               <Button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white">
                 Add to Cart
@@ -259,6 +165,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [email, setEmail] = useState('');
   const dispatch = useAppDispatch();
+  const [similarProduct, setSimilarProduct] = useState<IProduct[]>([]);
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
@@ -268,8 +175,22 @@ export default function ProductDetail({ product }: { product: IProduct }) {
   };
 
   const handleSubscribe = () => {
-    console.log('Subscribing email:', email);
     setEmail('');
+  };
+
+  useEffect(() => {
+    getSimilarProducts();
+  }, []);
+
+  const getSimilarProducts = async () => {
+    try {
+      const res = await getAllProducts(undefined, '4', {
+        category: product.category._id,
+      });
+      setSimilarProduct(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -289,9 +210,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                     <div className="w-8 h-12 bg-gray-800 rounded"></div>
                   </div>
                 </div>
-                <h3 className="font-bold text-gray-900">
-                  Download Flipmart App
-                </h3>
+                <h3 className="font-bold text-gray-900">Download Emart App</h3>
               </CardContent>
             </Card>
 
@@ -326,54 +245,47 @@ export default function ProductDetail({ product }: { product: IProduct }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Product Gallery */}
               <div>
-                <ProductGallery images={productData.images} />
+                <ProductGallery images={product?.imageUrls} />
               </div>
 
               {/* Product Details */}
               <div className="space-y-6">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                    {productData.name}
+                    {product.name}
                   </h1>
-                  <StarRating
-                    rating={productData.rating}
-                    reviewCount={productData.reviewCount}
-                  />
+                  <StarRating rating={product.ratingCount} reviewCount={0} />
                 </div>
 
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-600">Availability :</span>
                   <Badge
-                    variant={
-                      productData.availability === 'In Stock'
-                        ? 'default'
-                        : 'destructive'
-                    }
+                    variant={product.stock > 0 ? 'default' : 'destructive'}
                     className={
-                      productData.availability === 'In Stock'
+                      product.stock > 0
                         ? 'bg-green-100 text-green-800 hover:bg-green-200'
                         : 'bg-red-100 text-red-800 hover:bg-red-200'
                     }
                   >
-                    {productData.availability}
+                    {product.stock}
                   </Badge>
                 </div>
 
                 <p className="text-gray-600 leading-relaxed">
-                  {productData.description}
+                  {product.description}
                 </p>
 
                 <div className="flex items-center space-x-4">
                   <span className="text-3xl font-bold text-red-500">
-                    ${productData.price.toFixed(2)}
+                    ${Number(product.price).toFixed(2)}
                   </span>
                   <span className="text-lg text-gray-500 line-through">
-                    ${productData.originalPrice.toFixed(2)}
+                    ${Number(product.offerPrice).toFixed(2)}
                   </span>
                   <Badge className="bg-red-500 hover:bg-red-600 text-white">
                     {Math.round(
-                      ((productData.originalPrice - productData.price) /
-                        productData.originalPrice) *
+                      ((Number(product.price) - Number(product.offerPrice)) /
+                        product.price) *
                         100
                     )}
                     % OFF
@@ -419,7 +331,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       ADD TO CART
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       size="icon"
                       onClick={() => setIsWishlisted(!isWishlisted)}
@@ -432,7 +344,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                       <Heart
                         className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`}
                       />
-                    </Button>
+                    </Button> */}
                     <Button variant="outline" size="icon">
                       <Share2 className="h-4 w-4" />
                     </Button>
@@ -463,15 +375,15 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">SKU:</span>
-                    <span className="font-medium">{productData.sku}</span>
+                    <span className="font-medium">162</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Category:</span>
-                    <span className="font-medium">{productData.category}</span>
+                    <span className="font-medium">special</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Brand:</span>
-                    <span className="font-medium">{productData.brand}</span>
+                    <span className="font-medium">Samsung</span>
                   </div>
                 </div>
               </div>
@@ -482,9 +394,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
               <Tabs defaultValue="description" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="description">Description</TabsTrigger>
-                  <TabsTrigger value="reviews">
-                    Reviews ({productData.reviewCount})
-                  </TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews (2)</TabsTrigger>
                   <TabsTrigger value="shipping">Shipping Info</TabsTrigger>
                 </TabsList>
                 <TabsContent value="description" className="mt-6">
@@ -494,13 +404,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                         Product Description
                       </h3>
                       <p className="text-gray-600 leading-relaxed mb-4">
-                        {productData.description}
-                      </p>
-                      <p className="text-gray-600 leading-relaxed">
-                        Duis aute irure dolor in reprehenderit in voluptate
-                        velit esse cillum dolore eu fugiat nulla pariatur.
-                        Excepteur sint occaecat cupidatat non proident, sunt in
-                        culpa qui officia deserunt mollit anim id est laborum.
+                        {product.description}
                       </p>
                     </CardContent>
                   </Card>
@@ -558,7 +462,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
             </div>
 
             {/* Similar Products */}
-            <SimilarProducts />
+            <SimilarProducts similarProduct={similarProduct} />
           </div>
         </div>
       </div>

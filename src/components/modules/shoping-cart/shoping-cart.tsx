@@ -38,6 +38,7 @@ import {
   couponSelector,
   decrementOrderQuantity,
   discountAmountSelector,
+  fetchCoupon,
   grandTotalSelector,
   incrementOrderQuantity,
   orderedProductsSelector,
@@ -51,7 +52,7 @@ import {
   updateShippingAddress,
 } from '@/redux/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { addCoupon, createOrder } from '@/service/cart';
+import { createOrder } from '@/service/cart';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -67,62 +68,6 @@ interface CartItem {
   inStock: boolean;
   maxQuantity: number;
 }
-
-interface CartSummary {
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  discount: number;
-  total: number;
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: '1',
-    name: 'Floral Print Buttoned Shirt',
-    price: 800.0,
-    originalPrice: 900.0,
-    image: '/placeholder.svg?height=120&width=120',
-    quantity: 2,
-    size: 'M',
-    color: 'Blue',
-    inStock: true,
-    maxQuantity: 10,
-  },
-  {
-    id: '2',
-    name: 'Premium Wireless Headphones',
-    price: 199.99,
-    originalPrice: 249.99,
-    image: '/placeholder.svg?height=120&width=120',
-    quantity: 1,
-    color: 'Black',
-    inStock: true,
-    maxQuantity: 5,
-  },
-  {
-    id: '3',
-    name: 'Smart Fitness Watch',
-    price: 299.99,
-    image: '/placeholder.svg?height=120&width=120',
-    quantity: 1,
-    size: '42mm',
-    color: 'Silver',
-    inStock: false,
-    maxQuantity: 3,
-  },
-  {
-    id: '4',
-    name: 'Leather Laptop Bag',
-    price: 149.99,
-    originalPrice: 199.99,
-    image: '/placeholder.svg?height=120&width=120',
-    quantity: 1,
-    color: 'Brown',
-    inStock: true,
-    maxQuantity: 8,
-  },
-];
 
 export default function ShoppingCartSection() {
   const [promoCode, setPromoCode] = useState('');
@@ -206,19 +151,19 @@ export default function ShoppingCartSection() {
 
   const applyPromoCode = async () => {
     try {
-      const couponData = {
+      const formObj = {
         orderAmount: subTotal,
         shopId,
         couponCode: promoCode,
       };
-
-      console.log(couponData);
-
-      const res = await addCoupon(
-        couponData.couponCode,
-        couponData.orderAmount,
-        couponData.shopId
+      const res = dispatch(
+        fetchCoupon({
+          couponCode: String(promoCode),
+          subTotal: Number(subTotal),
+          shopId: String(shopId),
+        }) as any
       );
+
       console.log(res);
     } catch (error: any) {
       console.log(error);

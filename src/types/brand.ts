@@ -1,3 +1,5 @@
+import { IProduct } from './product';
+
 export interface IBrand {
   _id: string;
   name: string;
@@ -6,4 +8,8 @@ export interface IBrand {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IBrandWithProducts extends IBrand {
+  products: IProduct[];
 }

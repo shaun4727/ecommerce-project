@@ -16,13 +16,38 @@ export const getAllProducts = async (
   }
 
   if (query?.category) {
-    params.append('categories', query?.category.toString());
+    const categoryString =
+      typeof query?.category === 'string'
+        ? query?.category
+        : query?.category?.toString();
+    params.append('categories', categoryString);
   }
-  if (query?.brand) {
-    params.append('brands', query?.brand.toString());
+  if (query?.brands) {
+    params.append('brands', query?.brands.toString());
   }
   if (query?.rating) {
     params.append('ratings', query?.rating.toString());
+  }
+  if (query?.trending) {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/product/trending`
+      );
+
+      return await res.json();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  if (query?.flashSale) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/flash-sale`);
+
+      return await res.json();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   try {
@@ -96,5 +121,27 @@ export const updateProduct = async (
     return res.json();
   } catch (error: any) {
     return Error(error);
+  }
+};
+
+export const getTrendingProductsApi = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/product/trending`
+    );
+    const data = await res.json();
+    return data;
+  } catch (error: any) {
+    return Error(error.message);
+  }
+};
+
+export const getFlashSaleProductsApi = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/flash-sale`);
+    const data = await res.json();
+    return data;
+  } catch (error: any) {
+    return Error(error.message);
   }
 };

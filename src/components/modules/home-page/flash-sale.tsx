@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Heart, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { IProduct } from '@/types';
+import { useRouter } from 'next/navigation';
 
 interface Product {
   id: string;
@@ -137,28 +139,36 @@ function CountdownTimer() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: IProduct }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const progressPercentage = (product.sold / product.total) * 100;
+  const progressPercentage = 25;
+  const router = useRouter();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID').format(price);
   };
 
+  const getProductDetail = () => {
+    router.push(`/products/${product._id}`);
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white">
+    <Card
+      className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white"
+      onClick={getProductDetail}
+    >
       <CardContent className="p-0">
         {/* Product Image */}
         <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
           <Image
-            src={product.image || '/placeholder.svg'}
-            alt={product.name}
+            src={product?.imageUrls?.[0] || '/placeholder.svg'}
+            alt={product?.name || 'product-img'}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
 
           {/* Wishlist Button */}
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className={`absolute top-3 right-3 rounded-full w-8 h-8 ${
@@ -171,11 +181,11 @@ function ProductCard({ product }: { product: Product }) {
             <Heart
               className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`}
             />
-          </Button>
+          </Button> */}
 
           {/* Discount Badge */}
           <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white">
-            -{product.discount}%
+            -35%
           </Badge>
         </div>
 
@@ -189,13 +199,13 @@ function ProductCard({ product }: { product: Product }) {
           <div className="mb-3">
             <div className="flex items-center space-x-2 mb-1">
               <span className="text-lg font-bold text-blue-600">
-                {product.currency}
-                {formatPrice(product.currentPrice)}
+                BDT
+                {formatPrice(product.offerPrice)}
               </span>
             </div>
             <span className="text-sm text-gray-500 line-through">
-              {product.currency}
-              {formatPrice(product.originalPrice)}
+              BDT
+              {formatPrice(product.price)}
             </span>
           </div>
 
@@ -210,18 +220,21 @@ function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Sale Progress */}
-          <p className="text-sm text-gray-600">
-            {product.sold}/{product.total} Sale
-          </p>
+          <p className="text-sm text-gray-600">30 Sale</p>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export default function FlashSale() {
+export default function FlashSale({
+  flashSaleProducts,
+}: {
+  flashSaleProducts: IProduct[];
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerView = 4;
+  const router = useRouter();
 
   const nextSlide = () => {
     setCurrentIndex(
@@ -236,6 +249,10 @@ export default function FlashSale() {
         (prev - 1 + Math.max(1, featuredProducts.length - itemsPerView + 1)) %
         Math.max(1, featuredProducts.length - itemsPerView + 1)
     );
+  };
+
+  const viewAllFlashSaleItem = () => {
+    router.push(`/products?flashSale=1`);
   };
 
   return (
@@ -284,8 +301,8 @@ export default function FlashSale() {
                 transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
               }}
             >
-              {featuredProducts.map((product) => (
-                <div key={product.id} className="w-1/4 flex-shrink-0 px-3">
+              {flashSaleProducts?.map((product) => (
+                <div key={product._id} className="w-1/4 flex-shrink-0 px-3">
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -295,8 +312,8 @@ export default function FlashSale() {
           {/* Mobile Scroll */}
           <div className="md:hidden">
             <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-              {featuredProducts.map((product) => (
-                <div key={product.id} className="w-64 flex-shrink-0">
+              {flashSaleProducts?.map((product) => (
+                <div key={product._id} className="w-64 flex-shrink-0">
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -308,6 +325,7 @@ export default function FlashSale() {
         <div className="text-center mt-8">
           <Button
             variant="outline"
+            onClick={viewAllFlashSaleItem}
             size="lg"
             className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-200"
           >

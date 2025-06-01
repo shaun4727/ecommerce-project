@@ -1,13 +1,12 @@
 'use client';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import { EPTable } from '@/components/ui/core/EPTable';
 import TablePagination from '@/components/ui/core/EPTable/TablePagination';
 
-import { IMeta, IProduct } from '@/types';
+import { IMeta } from '@/types';
+import { ICouponData } from '@/types/cart';
 import { ColumnDef } from '@tanstack/react-table';
 import { Edit, Eye, Trash } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -15,15 +14,15 @@ const CouponTable = ({
   coupons,
   meta,
 }: {
-  coupons: IProduct[];
+  coupons: ICouponData[];
   meta: IMeta;
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProductsId, setSelectedProductsId] = useState<string[]>([]);
-
+  console.log(coupons);
   const router = useRouter();
 
-  const handleView = (product: IProduct) => {
+  const handleView = (product: ICouponData) => {
     console.log('Viewing product:', product);
   };
 
@@ -31,86 +30,27 @@ const CouponTable = ({
     console.log('Deleting product with ID:', productId);
   };
 
-  const columns: ColumnDef<IProduct>[] = [
+  const columns: ColumnDef<ICouponData>[] = [
     {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => {
-            table.toggleAllPageRowsSelected(!!value);
-          }}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => {
-            if (value) {
-              setSelectedProductsId([...selectedProductsId, row.original._id]);
-            } else {
-              setSelectedProductsId(
-                selectedProductsId.filter((id) => id !== row.original._id)
-              );
-            }
-
-            row.toggleSelected(!!value);
-          }}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: 'name',
-      header: 'Product Name',
+      accessorKey: 'code',
+      header: 'Code',
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <Image
-            src={row.original.imageUrls[0]}
-            alt={row.original.name}
-            width={40}
-            height={40}
-            className="w-8 h-8 rounded-full"
-          />
-          <span className="truncate">{row.original.name}</span>
+          <span className="truncate">{row.original.code}</span>
         </div>
       ),
     },
     {
-      accessorKey: 'category',
-      header: 'Category',
-      cell: ({ row }) => <span>{row.original.category.name}</span>,
+      accessorKey: 'type',
+      header: 'Type',
+      cell: ({ row }) => <span>{row.original.discountType}</span>,
     },
     {
-      accessorKey: 'brand',
-      header: 'Brand',
-      cell: ({ row }) => <span>{row.original.brand.name}</span>,
+      accessorKey: 'value',
+      header: 'Value',
+      cell: ({ row }) => <span>{row.original.discountValue}</span>,
     },
-    {
-      accessorKey: 'stock',
-      header: 'Stock',
-      cell: ({ row }) => <span>{row.original.stock}</span>,
-    },
-    {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: ({ row }) => <span>$ {row.original.price.toFixed(2)}</span>,
-    },
-    {
-      accessorKey: 'offerPrice',
-      header: 'Ofter Price',
-      cell: ({ row }) => (
-        <span>
-          $ {row.original.offerPrice ? row.original.offerPrice.toFixed(2) : '0'}
-        </span>
-      ),
-    },
+
     {
       accessorKey: 'action',
       header: 'Action',
@@ -127,9 +67,7 @@ const CouponTable = ({
           <button
             className="text-gray-500 hover:text-green-500"
             title="Edit"
-            onClick={() =>
-              router.push(`/admin/shop/update-product/${row.original._id}`)
-            }
+            // onClick={() =>router.push(`/admin/shop/update-product/${row.original._id}`)}
           >
             <Edit className="w-5 h-5" />
           </button>
@@ -137,7 +75,7 @@ const CouponTable = ({
           <button
             className="text-gray-500 hover:text-red-500"
             title="Delete"
-            onClick={() => handleDelete(row.original._id)}
+            // onClick={() => handleDelete(row.original._id)}
           >
             <Trash className="w-5 h-5" />
           </button>

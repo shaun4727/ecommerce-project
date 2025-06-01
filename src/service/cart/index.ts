@@ -1,6 +1,7 @@
 'use server';
 
-import { IOrder } from '@/types/cart';
+import { ICoupon, IOrder } from '@/types/cart';
+import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export const createOrder = async (order: IOrder) => {
@@ -35,6 +36,63 @@ export const addCoupon = async (
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderAmount: subTotal, shopId }),
+      }
+    );
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const createCouponApi = async (formData: any) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/coupon`, {
+      method: 'POST',
+      headers: {
+        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    revalidateTag('Coupons');
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const getAllCouponApi = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/coupon`, {
+      method: 'GET',
+      headers: {
+        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+        'Content-Type': 'application/json',
+      },
+      next: {
+        tags: ['Coupons'],
+      },
+    });
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const applyCouponCodeApi = async (coupon: ICoupon) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/coupon/${coupon.couponCode}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(coupon),
       }
     );
 

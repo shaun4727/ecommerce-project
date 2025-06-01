@@ -70,7 +70,7 @@ const ManageProducts = ({
         <div className="flex items-center space-x-3">
           <Image
             src={row.original.imageUrls[0]}
-            alt={row.original.name}
+            alt="product-image"
             width={40}
             height={40}
             className="w-8 h-8 rounded-full"

@@ -6,6 +6,8 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { IProduct } from '@/types';
+import { useRouter } from 'next/navigation';
 
 interface ColorOption {
   name: string;
@@ -171,19 +173,28 @@ function ColorSwatches({
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: IProduct }) {
   const [selectedColor, setSelectedColor] = useState(
-    product.colors[0]?.value || ''
+    product.availableColors?.[0] || ''
   );
 
+  const router = useRouter();
+
+  const getDetailOfSingleProduct = () => {
+    router.push(`/products/${product._id}`);
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white">
+    <Card
+      className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white"
+      onClick={getDetailOfSingleProduct}
+    >
       <CardContent className="p-0">
         {/* Product Image */}
         <div className="relative aspect-square bg-gray-50 rounded-t-lg overflow-hidden">
           <Image
-            src={product.image || '/placeholder.svg'}
-            alt={product.name}
+            src={product.imageUrls?.[0] || '/placeholder.svg'}
+            alt={`product-image`}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -192,10 +203,7 @@ function ProductCard({ product }: { product: Product }) {
         {/* Product Info */}
         <div className="p-4">
           {/* Rating */}
-          <StarRating
-            rating={product.rating}
-            reviewCount={product.reviewCount}
-          />
+          <StarRating rating={product?.ratingCount} reviewCount={0} />
 
           {/* Product Name */}
           <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 leading-tight text-sm">
@@ -210,20 +218,26 @@ function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Color Options */}
-          <ColorSwatches
+          {/* <ColorSwatches
             colors={product.colors}
             selectedColor={selectedColor}
             onColorChange={setSelectedColor}
-          />
+          /> */}
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export default function FeaturedProducts() {
+export default function FeaturedProducts({
+  trendingProducts,
+}: {
+  trendingProducts: IProduct[];
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerView = 4;
+
+  const router = useRouter();
 
   const nextSlide = () => {
     setCurrentIndex(
@@ -240,13 +254,17 @@ export default function FeaturedProducts() {
     );
   };
 
+  const getAllTrending = () => {
+    router.push(`/products?trending=1`);
+  };
+
   return (
     <div className="w-full bg-white py-12">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-gray-900">
-            Our Newest Arrivals
+            Our Trending Products
           </h2>
 
           {/* Navigation Arrows */}
@@ -282,8 +300,8 @@ export default function FeaturedProducts() {
                 transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
               }}
             >
-              {newestProducts.map((product) => (
-                <div key={product.id} className="w-1/4 flex-shrink-0 px-3">
+              {trendingProducts?.map((product) => (
+                <div key={product._id} className="w-1/4 flex-shrink-0 px-3">
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -292,9 +310,11 @@ export default function FeaturedProducts() {
 
           {/* Mobile Grid */}
           <div className="md:hidden grid grid-cols-2 gap-4">
-            {newestProducts.slice(0, 4).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {trendingProducts
+              ?.slice(0, 4)
+              .map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
           </div>
         </div>
 
@@ -302,10 +322,11 @@ export default function FeaturedProducts() {
         <div className="text-center mt-8">
           <Button
             variant="outline"
+            onClick={getAllTrending}
             size="lg"
             className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-200"
           >
-            View All New Arrivals
+            View All Trending
           </Button>
         </div>
       </div>
