@@ -10,9 +10,11 @@ export const getAllProducts = async (
 ) => {
   const params = new URLSearchParams();
 
-  if (query?.price) {
-    params.append('minPrice', '0');
-    params.append('maxPrice', query?.price.toString());
+  if (query?.minPrice) {
+    params.append('minPrice', query?.minPrice.toString());
+  }
+  if (query?.maxPrice) {
+    params.append('maxPrice', query?.maxPrice.toString());
   }
 
   if (query?.category) {
@@ -28,6 +30,9 @@ export const getAllProducts = async (
   if (query?.rating) {
     params.append('ratings', query?.rating.toString());
   }
+  if (query?.searchTerm) {
+    params.append('searchTerm', query?.searchTerm.toString());
+  }
   if (query?.trending) {
     try {
       const res = await fetch(
@@ -36,7 +41,7 @@ export const getAllProducts = async (
 
       return await res.json();
     } catch (err) {
-      console.log(err);
+      err;
     }
   }
 

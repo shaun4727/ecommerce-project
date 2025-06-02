@@ -1,30 +1,20 @@
 'use client';
 
-import { Grid3X3, List, Minus, Plus, Star } from 'lucide-react';
+import { Grid3X3, List, Star } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import TablePagination from '@/components/ui/core/EPTable/TablePagination';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { addProduct } from '@/redux/features/cartSlice';
 import { useAppDispatch } from '@/redux/hooks';
-import { ICategory, IProduct } from '@/types';
-import { useRouter } from 'next/navigation';
+import { homePageBrandWithProduct } from '@/service/Brand';
+import { IBrandWithProducts, ICategory, IMeta, IProduct } from '@/types';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface FilterCategory {
   name: string;
@@ -137,30 +127,32 @@ type categoryWithId = ICategory & {
   _id: string;
 };
 
+interface filterOptionList {
+  brands: string[];
+  rating: number[];
+}
+
 export default function AllProductsSection({
   products,
-  category,
+  meta,
 }: {
   products: productsWithId[];
-  category: categoryWithId[];
+  meta: IMeta;
 }) {
-  const [priceRange, setPriceRange] = useState([200, 800]);
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [brandWithProduct, setBrandWithProduct] = useState<
+    IBrandWithProducts[]
+  >([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('position');
-  const [showItems, setShowItems] = useState('12');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [restQuery, setRestQuery] = useState('');
+  const [priceRange, setPriceRange] = useState([10, 150]);
   const router = useRouter();
-
-  const toggleCategory = (categoryName: string) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryName)
-        ? prev.filter((name) => name !== categoryName)
-        : [...prev, categoryName]
-    );
-  };
+  const [filterState, setFilterState] = useState<filterOptionList>({
+    brands: [],
+    rating: [],
+  });
+  const searchParams = useSearchParams();
 
   const toggleBrand = (brandId: string) => {
     setSelectedBrands((prev) =>
@@ -170,23 +162,100 @@ export default function AllProductsSection({
     );
   };
 
-  const handleRatingFilter = (rating: number) => {
-    setSelectedRating(selectedRating === rating ? null : rating);
+  const getBrandsWithProducts = async () => {
+    try {
+      const res = await homePageBrandWithProduct();
+      if (res?.success) {
+        setBrandWithProduct(res?.data);
+      } else {
+        console.log(res?.message);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const clearAllFilters = () => {
-    setPriceRange([200, 800]);
-    setSelectedBrands([]);
-    setSelectedRating(null);
-    setExpandedCategories([]);
-  };
+  useEffect(() => {
+    getBrandsWithProducts();
+  }, []);
+
+  // const clearAllFilters = () => {
+  //   setPriceRange([200, 800]);
+  //   setSelectedBrands([]);
+  //   setSelectedRating(null);
+  // };
   const dispatch = useAppDispatch();
-  const handleAddProduct = (product: IProduct) => {
+  const handleAddProduct = (
+    product: IProduct,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation();
     dispatch(addProduct(product));
   };
 
   const getDetailOfTheProduct = (product: IProduct) => {
     router.push(`/products/${product._id}`);
+  };
+
+  const updateFilterParameters = (obj: { brand?: string; rating?: number }) => {
+    if (obj?.brand) {
+      setFilterState((prev) => {
+        const brand = obj.brand as string;
+        if (prev.brands.includes(brand)) {
+          return {
+            ...prev,
+            brands: prev.brands.filter((id: string) => id !== obj.brand),
+          };
+        } else {
+          return { ...prev, brands: [...prev.brands, brand] };
+        }
+      });
+    }
+    if (obj?.rating) {
+      setFilterState((prev) => {
+        const rating = obj.rating as number;
+        if (prev.rating.includes(rating)) {
+          return {
+            ...prev,
+            rating: prev.rating.filter((id: number) => id !== obj.rating),
+          };
+        } else {
+          return { ...prev, rating: [...prev.rating, rating] };
+        }
+      });
+    }
+  };
+
+  const applyFilterMethod = () => {
+    const parameters = Object.entries(
+      Object.fromEntries(searchParams.entries())
+    );
+    const filtered = parameters.filter(
+      ([key]) =>
+        key !== 'minPrice' &&
+        key !== 'maxPrice' &&
+        key !== 'brands' &&
+        key !== 'rating' &&
+        key !== 'page' &&
+        key !== 'category'
+    );
+    let string: string[] = [];
+    filtered.forEach((param) => {
+      const [key, value] = param;
+      string.push(`${key}=${value}`);
+    });
+
+    if (filterState.brands.length) {
+      string.push(`brands=${filterState.brands.toString()}`);
+    }
+    if (filterState.rating.length) {
+      string.push(`rating=${filterState.rating.toString()}`);
+    }
+    if (priceRange) {
+      string.push(`minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
+    }
+    setRestQuery(string.join('&'));
+    router.push(`/products?${string.join('&')}`);
   };
 
   return (
@@ -199,82 +268,41 @@ export default function AllProductsSection({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold text-gray-900">SHOP BY</h3>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     onClick={clearAllFilters}
                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                   >
                     Clear All
-                  </Button>
+                  </Button> */}
                 </div>
-
-                {/* Category Filters */}
-                <div className="mb-8">
-                  <h4 className="font-semibold text-gray-900 mb-4">Category</h4>
-                  <div className="space-y-2">
-                    {filterCategories.map((category) => (
-                      <Collapsible
-                        key={category.name}
-                        open={expandedCategories.includes(category.name)}
-                        onOpenChange={() => toggleCategory(category.name)}
-                      >
-                        <CollapsibleTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-between p-2 h-auto text-left hover:bg-gray-50"
-                          >
-                            <span className="text-gray-700">
-                              {category.name}
-                            </span>
-                            {expandedCategories.includes(category.name) ? (
-                              <Minus className="h-4 w-4 text-gray-500" />
-                            ) : (
-                              <Plus className="h-4 w-4 text-gray-500" />
-                            )}
-                          </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pl-4 space-y-2">
-                          {category.items.map((item) => (
-                            <Button
-                              key={item}
-                              variant="ghost"
-                              className="w-full justify-start p-2 h-auto text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                            >
-                              {item}
-                            </Button>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
 
                 {/* Brand Filters */}
                 <div className="mb-8">
                   <h4 className="font-semibold text-gray-900 mb-4">Brand</h4>
                   <div className="space-y-3 overflow-y-auto">
-                    {brands.map((brand) => (
+                    {brandWithProduct.map((brand) => (
                       <div
-                        key={brand.id}
+                        key={brand._id}
                         className="flex items-center space-x-3"
                       >
                         <Checkbox
-                          id={brand.id}
-                          checked={selectedBrands.includes(brand.id)}
-                          onCheckedChange={() => toggleBrand(brand.id)}
+                          id={brand._id}
+                          // checked={selectedBrands.includes(brand._id)}
+                          onCheckedChange={() =>
+                            updateFilterParameters({ brand: brand._id })
+                          }
                           className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                         />
                         <label
-                          htmlFor={brand.id}
+                          htmlFor={brand._id}
                           className="flex-1 text-sm text-gray-700 cursor-pointer hover:text-blue-600 transition-colors"
                         >
                           <div className="flex items-center justify-between">
                             <span>{brand.name}</span>
                             <span className="text-xs text-gray-500">
-                              ({brand.count})
+                              ({brand?.products?.length || 0})
                             </span>
                           </div>
                         </label>
@@ -295,8 +323,9 @@ export default function AllProductsSection({
                       <div key={rating} className="flex items-center space-x-3">
                         <Checkbox
                           id={`rating-${rating}`}
-                          checked={selectedRating === rating}
-                          onCheckedChange={() => handleRatingFilter(rating)}
+                          onCheckedChange={() =>
+                            updateFilterParameters({ rating: rating })
+                          }
                           className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                         />
                         <label
@@ -323,10 +352,10 @@ export default function AllProductsSection({
                   <div className="space-y-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-red-500 font-medium">
-                        ${priceRange[0]}.00
+                        BDT {priceRange[0]}.00
                       </span>
                       <span className="text-red-500 font-medium">
-                        ${priceRange[1]}.00
+                        BDT {priceRange[1]}.00
                       </span>
                     </div>
                     <Slider
@@ -337,7 +366,10 @@ export default function AllProductsSection({
                       step={10}
                       className="w-full"
                     />
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={applyFilterMethod}
+                    >
                       Apply Filters
                     </Button>
                   </div>
@@ -452,7 +484,7 @@ export default function AllProductsSection({
               </div>
 
               {/* Sort and Show Controls */}
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Sort by</span>
                   <Select value={sortBy} onValueChange={setSortBy}>
@@ -482,7 +514,7 @@ export default function AllProductsSection({
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Products Grid/List */}
@@ -536,22 +568,22 @@ export default function AllProductsSection({
                         </p>
                         <div className="flex items-center space-x-2 mb-2">
                           <span className="text-lg font-bold text-blue-600">
-                            ${product.price}
+                            BDT {Number(product.price).toFixed(2)}
                           </span>
                           {product.offerPrice && (
                             <span className="text-sm text-gray-500 line-through">
-                              ${product.offerPrice}
+                              ${Number(product.offerPrice).toFixed(2)}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center space-x-1 min-h-3 mb-3">
+                        <div className="flex flex-col gap-1 items-start space-x-1 min-h-3 mb-3">
                           <StarRating rating={product.ratingCount} />
                           <span className="text-sm text-gray-500">
                             ({product.description})
                           </span>
                         </div>
                         <Button
-                          onClick={() => handleAddProduct(product)}
+                          onClick={(e) => handleAddProduct(product, e)}
                           className="w-full bottom-0 bg-blue-600 hover:bg-blue-700 text-white absolute"
                         >
                           Add to Cart
@@ -561,7 +593,10 @@ export default function AllProductsSection({
                   </Card>
                 ))}
             </div>
-
+            <TablePagination
+              totalPage={meta?.totalPage}
+              restQuery={restQuery}
+            />
             {/* Pagination */}
             {/* <div className="flex justify-center mt-8">
               <div className="flex items-center space-x-2">

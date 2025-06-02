@@ -164,7 +164,6 @@ export default function UpdateProductForm({ product }: { product: IProduct }) {
   return (
     <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-2xl p-5 ">
       <div className="flex items-center space-x-4 mb-5 ">
-        Logo
         <h1 className="text-xl font-bold">Update Product Info</h1>
       </div>
       <Form {...form}>

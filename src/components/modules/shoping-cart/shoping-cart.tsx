@@ -199,13 +199,15 @@ export default function ShoppingCartSection() {
               <h1 className="text-3xl font-bold text-gray-900">
                 Shopping Cart
               </h1>
-              <p className="text-gray-600">{12} items in your cart</p>
+              <p className="text-gray-600">
+                {cartProducts.length} items in your cart
+              </p>
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-2">
             <ShoppingBag className="h-6 w-6 text-blue-600" />
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              {12}
+              {cartProducts.length}
             </Badge>
           </div>
         </div>

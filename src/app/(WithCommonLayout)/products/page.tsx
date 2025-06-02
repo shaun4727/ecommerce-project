@@ -12,9 +12,13 @@ const AllProductsPage = async ({
   const query = await searchParams;
 
   const { data: categories } = await getAllCategories();
-  const { data: products } = await getAllProducts(undefined, undefined, query);
+  const { data: products, meta } = await getAllProducts(
+    undefined,
+    undefined,
+    query
+  );
 
-  return <AllProductsSection products={products} category={categories} />;
+  return <AllProductsSection products={products} meta={meta} />;
 };
 
 export default AllProductsPage;
