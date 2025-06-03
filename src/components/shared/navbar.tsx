@@ -113,7 +113,11 @@ export default function NavbarComponent() {
     }
   };
   const dashboardHandler = () => {
-    router.push('/admin/dashboard');
+    if (user?.role === 'user') {
+      router.push('/user/dashboard');
+    } else {
+      router.push('/admin/dashboard');
+    }
   };
 
   if (!isClient) return null;

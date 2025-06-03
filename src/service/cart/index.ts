@@ -101,3 +101,41 @@ export const applyCouponCodeApi = async (coupon: ICoupon) => {
     return Error(error);
   }
 };
+
+export const getMyOrderDetailApi = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/my-orders`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const getMyShopOrdersApi = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/my-shop-orders`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};

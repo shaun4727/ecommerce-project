@@ -3,17 +3,13 @@
 import React, { useState } from 'react';
 
 import {
-  Baby,
   ChevronDown,
   ChevronRight,
-  FileText,
   Gem,
   Home,
   Laptop,
   Menu,
-  Shirt,
   ShoppingBag,
-  Tag,
   Watch,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -52,114 +48,114 @@ const menuItems: MenuItem[] = [
     icon: <Home className="h-4 w-4" />,
   },
   {
-    name: 'CLOTHING',
-    href: '/clothing',
-    icon: <Shirt className="h-4 w-4" />,
-  },
-  {
-    name: 'ELECTRONICS',
+    name: 'ELECTRONIC &amp; OTHERS',
     icon: <Laptop className="h-4 w-4" />,
     categories: [
       {
-        name: 'Laptops',
-        items: [
-          { name: 'Gaming', href: '/electronics/laptops/gaming' },
-          { name: 'Laptop Skins', href: '/electronics/laptops/skins' },
-          { name: 'Apple', href: '/electronics/laptops/apple' },
-          { name: 'Dell', href: '/electronics/laptops/dell' },
-          { name: 'Lenovo', href: '/electronics/laptops/lenovo' },
-          { name: 'Microsoft', href: '/electronics/laptops/microsoft' },
-          { name: 'Asus', href: '/electronics/laptops/asus' },
-          { name: 'Adapters', href: '/electronics/laptops/adapters' },
-          { name: 'Batteries', href: '/electronics/laptops/batteries' },
-          { name: 'Cooling Pads', href: '/electronics/laptops/cooling-pads' },
-        ],
-      },
-      {
-        name: 'Desktops',
+        name: 'Home Accessories',
         items: [
           {
-            name: 'Routers & Modems',
-            href: '/electronics/desktops/routers-modems',
+            name: 'Bedding',
+            href: '/products?category=683770a6e4003a6d8ae07ad8',
           },
-          { name: 'CPUs, Processors', href: '/electronics/desktops/cpus' },
-          { name: 'PC Gaming Store', href: '/electronics/desktops/gaming' },
-          { name: 'Graphics Cards', href: '/electronics/desktops/graphics' },
-          { name: 'Components', href: '/electronics/desktops/components' },
-          { name: 'Webcam', href: '/electronics/desktops/webcam' },
-          { name: 'Memory (RAM)', href: '/electronics/desktops/memory' },
-          { name: 'Motherboards', href: '/electronics/desktops/motherboards' },
-          { name: 'Keyboards', href: '/electronics/desktops/keyboards' },
-          { name: 'Headphones', href: '/electronics/desktops/headphones' },
+          {
+            name: 'Furniture',
+            href: '/products?category=683770a6e4003a6d8ae07ad9',
+          },
+          {
+            name: 'Wall Art',
+            href: '/products?category=683770a6e4003a6d8ae07adb',
+          },
+          {
+            name: 'Lighting & Ceiling Fans',
+            href: '/products?category=683770a6e4003a6d8ae07ada',
+          },
         ],
       },
       {
-        name: 'Cameras',
+        name: 'Computer',
         items: [
-          { name: 'Accessories', href: '/electronics/cameras/accessories' },
-          { name: 'Binoculars', href: '/electronics/cameras/binoculars' },
-          { name: 'Telescopes', href: '/electronics/cameras/telescopes' },
-          { name: 'Camcorders', href: '/electronics/cameras/camcorders' },
-          { name: 'Digital', href: '/electronics/cameras/digital' },
-          { name: 'Film Cameras', href: '/electronics/cameras/film' },
-          { name: 'Flashes', href: '/electronics/cameras/flashes' },
-          { name: 'Lenses', href: '/electronics/cameras/lenses' },
-          { name: 'Surveillance', href: '/electronics/cameras/surveillance' },
-          { name: 'Tripods', href: '/electronics/cameras/tripods' },
+          {
+            name: 'Computer Accessories',
+            href: '/products?category=6837702fe4003a6d8ae07ad4',
+          },
+          {
+            name: 'Monitors',
+            href: '/products?category=6837702fe4003a6d8ae07ad7',
+          },
+          {
+            name: 'Components',
+            href: '/products?category=6837702fe4003a6d8ae07ad5',
+          },
+          {
+            name: 'Laptop',
+            href: '/products?category=683800cd2e9873a563dc4586',
+          },
         ],
       },
       {
-        name: 'Mobile Phones',
+        name: 'Mobile Accessories',
         items: [
-          { name: 'Apple', href: '/electronics/mobile/apple' },
-          { name: 'Samsung', href: '/electronics/mobile/samsung' },
-          { name: 'Lenovo', href: '/electronics/mobile/lenovo' },
-          { name: 'Motorola', href: '/electronics/mobile/motorola' },
-          { name: 'LeEco', href: '/electronics/mobile/leeco' },
-          { name: 'Asus', href: '/electronics/mobile/asus' },
-          { name: 'Acer', href: '/electronics/mobile/acer' },
-          { name: 'Accessories', href: '/electronics/mobile/accessories' },
-          { name: 'Headphones', href: '/electronics/mobile/headphones' },
-          { name: 'Memory Cards', href: '/electronics/mobile/memory-cards' },
+          {
+            name: 'Headphones',
+            href: '/products?category=68376f2de4003a6d8ae07acf',
+          },
+          {
+            name: 'Cell Phones',
+            href: '/products?category=68376f2de4003a6d8ae07ace',
+          },
+          {
+            name: 'Telescopes',
+            href: '/products?category=6837702fe4003a6d8ae07ad6',
+          },
+          {
+            name: 'Tablets',
+            href: '/products?category=68376f2de4003a6d8ae07acc',
+          },
+        ],
+      },
+      {
+        name: 'Bags & Others',
+        items: [
+          {
+            name: 'Backpacks',
+            href: '/products?category=683770ece4003a6d8ae07add',
+          },
+          {
+            name: 'Suitcases',
+            href: '/products?category=683770ece4003a6d8ae07adf',
+          },
+          {
+            name: 'Travel Totes',
+            href: '/products?category=683770ece4003a6d8ae07ade',
+          },
+          {
+            name: 'Carry Ons',
+            href: '/products?category=683770ece4003a6d8ae07adc',
+          },
         ],
       },
     ],
   },
   {
-    name: 'HEALTH & BEAUTY',
-    href: '/health-beauty',
+    name: 'WATCHES',
+    href: '/products?category=683adfa8edd553ace12e63d4',
     icon: <ShoppingBag className="h-4 w-4" />,
   },
   {
-    name: 'WATCHES',
-    href: '/watches',
+    name: 'TSHIRTS',
+    href: '/products?category=683ae018edd553ace12e63d9',
     icon: <Watch className="h-4 w-4" />,
   },
   {
-    name: 'JEWELLERY',
-    href: '/jewellery',
+    name: 'FRUITS AND VEGETABLES',
+    href: '/products?category=683ae03cedd553ace12e63de',
     icon: <Gem className="h-4 w-4" />,
   },
   {
-    name: 'SHOES',
-    href: '/shoes',
+    name: 'CREATE SHOP',
+    href: '/create-shop',
     icon: <ShoppingBag className="h-4 w-4" />,
-  },
-  {
-    name: 'KIDS & GIRLS',
-    href: '/kids-girls',
-    icon: <Baby className="h-4 w-4" />,
-  },
-  {
-    name: 'PAGES',
-    href: '/pages',
-    icon: <FileText className="h-4 w-4" />,
-  },
-  {
-    name: 'TODAYS OFFER',
-    href: '/offers',
-    icon: <Tag className="h-4 w-4" />,
-    badge: 'HOT',
   },
 ];
 

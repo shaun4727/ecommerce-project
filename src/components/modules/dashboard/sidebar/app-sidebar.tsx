@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  Bot,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings,
-  SquareTerminal,
-} from 'lucide-react';
+import { Bot, SquareTerminal } from 'lucide-react';
 import * as React from 'react';
 
 import {
@@ -21,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useUser } from '@/context/UserContext';
 import Link from 'next/link';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
@@ -32,6 +24,57 @@ const data = {
       url: '/admin/dashboard',
       icon: SquareTerminal,
       isActive: true,
+      isCollapsible: false,
+    },
+    {
+      title: 'Order History',
+      url: '/admin/order-history',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
+    },
+    {
+      title: 'Shop',
+      url: '/admin/shop/products',
+      icon: Bot,
+      isCollapsible: true,
+      items: [
+        {
+          title: 'Manage Products',
+          url: '/admin/shop/products',
+        },
+        {
+          title: 'Manage Categories',
+          url: '/admin/shop/category',
+        },
+        {
+          title: 'Manage Brands',
+          url: '/admin/shop/brand',
+        },
+        {
+          title: 'Manage Coupon',
+          url: '/admin/shop/manage-coupon',
+        },
+      ],
+    },
+  ],
+};
+
+const UserData = {
+  navMain: [
+    {
+      title: 'Dashboard',
+      url: '/user/dashboard',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
+    },
+    {
+      title: 'Order History',
+      url: '/user/order-history',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
     },
     {
       title: 'Shop',
@@ -56,51 +99,11 @@ const data = {
         },
       ],
     },
-
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings,
-      items: [
-        {
-          title: 'Profile',
-          url: '/profile',
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Support',
-      url: '#',
-      icon: LifeBuoy,
-    },
-    {
-      title: 'Feedback',
-      url: '#',
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, setIsLoading } = useUser();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -118,7 +121,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        {user?.role === 'admin' && (
+          <NavMain items={data.navMain} role={user?.role} />
+        )}
+        {user?.role === 'user' && (
+          <NavMain items={UserData.navMain} role={user?.role} />
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

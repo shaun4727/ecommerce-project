@@ -59,6 +59,23 @@ export const getCurrentUser = async () => {
   }
 };
 
+export const getProfileDataApi = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+      },
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const reCaptchaTokenVerification = async (token: string) => {
   try {
     const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
