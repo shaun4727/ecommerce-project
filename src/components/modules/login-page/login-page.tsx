@@ -5,15 +5,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  loginUserApi,
-  reCaptchaTokenVerification,
-} from '@/service/AuthService';
+import { loginUserApi } from '@/service/AuthService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -28,7 +23,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 const LoginPageComponent = () => {
   const router = useRouter();
 
-  const [reCaptchaStatus, setReCaptchaStatus] = useState(false);
+  //   const [reCaptchaStatus, setReCaptchaStatus] = useState(false);
   const {
     register,
     handleSubmit,
@@ -49,16 +44,16 @@ const LoginPageComponent = () => {
     }
   };
 
-  const handleReCaptcha = async (value: string | null) => {
-    try {
-      const res = await reCaptchaTokenVerification(value!);
-      if (res?.success) {
-        setReCaptchaStatus(true);
-      }
-    } catch (err: any) {
-      console.error(err);
-    }
-  };
+  //   const handleReCaptcha = async (value: string | null) => {
+  //     try {
+  //       const res = await reCaptchaTokenVerification(value!);
+  //       if (res?.success) {
+  //         setReCaptchaStatus(true);
+  //       }
+  //     } catch (err: any) {
+  //       console.error(err);
+  //     }
+  //   };
 
   const onSubmit = async (data: LoginFormData) => {
     // loginUserApi
@@ -173,14 +168,14 @@ const LoginPageComponent = () => {
                 Forgot your Password?
               </Link>
             </div>
-            <ReCAPTCHA
+            {/* <ReCAPTCHA
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_CLIENT_KEY as string}
               onChange={handleReCaptcha}
-            />
+            /> */}
 
             {/* Login Button */}
             <Button
-              disabled={reCaptchaStatus ? false : true}
+              //   disabled={reCaptchaStatus ? false : true}
               style={{ marginTop: '5px' }}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 mt-6"
               type="submit"
