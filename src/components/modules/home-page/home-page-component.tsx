@@ -1,6 +1,6 @@
 'use client';
 
-import { IBrand, IProduct } from '@/types';
+import { IBrand, IBrandWithProducts, IProduct } from '@/types';
 import CategorySection from './category-section';
 import FeaturedProducts from './featured-products';
 import FlashSale from './flash-sale';
@@ -15,7 +15,7 @@ const HomePageComponent = ({
   allBrands,
 }: {
   data: IBrand[];
-  allBrands: IBrand[];
+  allBrands: IBrandWithProducts[];
   trendingProducts: IProduct[];
   flashSaleProducts: IProduct[];
 }) => {

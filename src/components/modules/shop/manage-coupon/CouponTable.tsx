@@ -87,7 +87,7 @@ const CouponTable = ({
   return (
     <div className="my-5">
       <EPTable columns={columns} data={coupons || []} />
-      <TablePagination totalPage={meta?.totalPage} />
+      <TablePagination totalPage={meta?.totalPage} restQuery="" />
     </div>
   );
 };

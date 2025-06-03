@@ -165,7 +165,7 @@ const ManageProducts = ({
         </div>
       </div>
       <EPTable columns={columns} data={products || []} />
-      <TablePagination totalPage={meta?.totalPage} />
+      <TablePagination totalPage={meta?.totalPage} restQuery="" />
     </div>
   );
 };
