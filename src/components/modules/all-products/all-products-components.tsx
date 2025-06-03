@@ -15,6 +15,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { homePageBrandWithProduct } from '@/service/Brand';
 import { IBrandWithProducts, ICategory, IMeta, IProduct } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface FilterCategory {
   name: string;
@@ -191,6 +192,7 @@ export default function AllProductsSection({
   ) => {
     e.stopPropagation();
     dispatch(addProduct(product));
+    toast.success('Product added to cart', { id: 1 });
   };
 
   const getDetailOfTheProduct = (product: IProduct) => {
