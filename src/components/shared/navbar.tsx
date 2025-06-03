@@ -221,7 +221,10 @@ export default function NavbarComponent() {
           </div>
 
           {/* Cart */}
-          <div className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded">
+          <div
+            className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded"
+            onClick={() => router.push('/cart')}
+          >
             <ShoppingCart className="h-5 w-5" />
             <div className="bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
               {cartProducts.length}
