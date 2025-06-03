@@ -168,7 +168,7 @@ export default function NavbarComponent() {
             </a> */}
             <button
               onClick={() => router.push('/cart')}
-              className="flex items-center space-x-1 hover:text-blue-200"
+              className="flex items-center space-x-1 hover:text-blue-200 cursor-pointer"
             >
               <ShoppingCart className="h-4 w-4" />
               <span>My Cart</span>
@@ -222,7 +222,7 @@ export default function NavbarComponent() {
 
           {/* Cart */}
           <div
-            className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded"
+            className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded cursor-pointer"
             onClick={() => router.push('/cart')}
           >
             <ShoppingCart className="h-5 w-5" />
