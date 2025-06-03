@@ -76,7 +76,8 @@ export const getAllCouponApi = async () => {
       },
     });
 
-    return await res.json();
+    const result = await res.json();
+    return result;
   } catch (error: any) {
     return Error(error);
   }

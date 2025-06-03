@@ -2,8 +2,8 @@
 
 import { EPTable } from '@/components/ui/core/EPTable';
 import TablePagination from '@/components/ui/core/EPTable/TablePagination';
-
 import { IMeta } from '@/types';
+
 import { ICouponData } from '@/types/cart';
 import { ColumnDef } from '@tanstack/react-table';
 import { Edit, Eye, Trash } from 'lucide-react';
@@ -87,7 +87,7 @@ const CouponTable = ({
   return (
     <div className="my-5">
       <EPTable columns={columns} data={coupons || []} />
-      <TablePagination totalPage={meta?.totalPage} restQuery="" />
+      <TablePagination totalPage={0} restQuery="" />
     </div>
   );
 };
