@@ -83,6 +83,15 @@ export function NavMain({
               </SidebarMenuButton>
             )}
 
+            {item.isCollapsible === false && role === 'agent' && (
+              <SidebarMenuButton tooltip={item.title}>
+                {item.icon && <item.icon />}
+                <Link href={item.url}>
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            )}
+
             {item.isCollapsible === false && role === 'admin' && (
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon && <item.icon />}

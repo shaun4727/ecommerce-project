@@ -77,6 +77,13 @@ const UserData = {
       isCollapsible: false,
     },
     {
+      title: 'Order Status',
+      url: '/user/order-status',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
+    },
+    {
       title: 'Shop',
       url: '/admin/shop/products',
       icon: Bot,
@@ -98,6 +105,25 @@ const UserData = {
           url: '/admin/shop/manage-coupon',
         },
       ],
+    },
+  ],
+};
+
+const AgentData = {
+  navMain: [
+    {
+      title: 'Dashboard',
+      url: '/agent/dashboard',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
+    },
+    {
+      title: 'Assigned Orders',
+      url: '/agent/assigned-orders',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
     },
   ],
 };
@@ -126,6 +152,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
         {user?.role === 'user' && (
           <NavMain items={UserData.navMain} role={user?.role} />
+        )}
+        {user?.role === 'agent' && (
+          <NavMain items={AgentData.navMain} role={user?.role} />
         )}
       </SidebarContent>
       <SidebarFooter>

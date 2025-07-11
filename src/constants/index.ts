@@ -5,4 +5,6 @@ export const protectedRoutes = [
   '/admin/:page',
   '/user',
   '/user/:page',
+  '/agent',
+  '/agent/:page',
 ];

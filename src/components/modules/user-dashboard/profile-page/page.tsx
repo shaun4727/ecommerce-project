@@ -232,7 +232,7 @@ export default function DashboardProfile() {
   const getUserProfileData = async () => {
     try {
       const res = await getProfileDataApi();
-      console.log(res.data);
+
       if (res.success) {
         setUserData(res.data);
       } else {

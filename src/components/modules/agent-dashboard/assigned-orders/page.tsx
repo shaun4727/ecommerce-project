@@ -213,7 +213,7 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
   );
 }
 
-export default function OrderHistory() {
+export default function AssignedOrderHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -318,8 +318,10 @@ export default function OrderHistory() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Order History</h1>
-          <p className="text-gray-600 mt-1">View all your orders detail</p>
+          <h1 className="text-2xl font-bold text-gray-900">Assigned Orders</h1>
+          <p className="text-gray-600 mt-1">
+            View all your assigned orders detail
+          </p>
         </div>
 
         {/* Filters and Search */}
@@ -397,7 +399,20 @@ export default function OrderHistory() {
                       ))}
                   </div>
                 </TableHead>
-
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort('customer')}
+                >
+                  <div className="flex items-center">
+                    Customer
+                    {sortColumn === 'customer' &&
+                      (sortDirection === 'asc' ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
+                </TableHead>
                 <TableHead>Payment</TableHead>
                 <TableHead
                   className="cursor-pointer"
@@ -412,12 +427,6 @@ export default function OrderHistory() {
                         <ChevronDown className="ml-1 h-4 w-4" />
                       ))}
                   </div>
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort('customer')}
-                >
-                  <div className="flex items-center">Status</div>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -436,43 +445,12 @@ export default function OrderHistory() {
                   >
                     <TableCell className="font-medium">#{order._id}</TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
-
+                    <TableCell>{order.user.name}</TableCell>
                     <TableCell>
                       <PaymentBadge status={order.status} />
                     </TableCell>
                     <TableCell>
                       BDT {Number(order.totalAmount).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Drawer>
-                        <DrawerTrigger asChild>
-                          <Button variant="outline">Open Drawer</Button>
-                        </DrawerTrigger>
-                        <DrawerContent>
-                          <div className="mx-auto w-full max-w-sm">
-                            <DrawerHeader>
-                              <DrawerTitle>Move Goal</DrawerTitle>
-                              <DrawerDescription>
-                                Set your daily activity goal.
-                              </DrawerDescription>
-                            </DrawerHeader>
-                            <div className="p-4 pb-0">
-                              <div className="mt-3 h-[120px]">
-                                <ResponsiveContainer
-                                  width="100%"
-                                  height="100%"
-                                ></ResponsiveContainer>
-                              </div>
-                            </div>
-                            <DrawerFooter>
-                              <Button>Submit</Button>
-                              <DrawerClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                              </DrawerClose>
-                            </DrawerFooter>
-                          </div>
-                        </DrawerContent>
-                      </Drawer>
                     </TableCell>
                   </TableRow>
                 ))

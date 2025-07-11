@@ -2,6 +2,8 @@
 
 import {
   ArrowLeft,
+  BadgeDollarSign,
+  BanknoteArrowDown,
   CreditCard,
   MapPin,
   Minus,
@@ -72,6 +74,7 @@ interface CartItem {
 export default function ShoppingCartSection() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState('');
+  const [paymentOption, setPaymentOption] = useState(0);
   const dispatch = useAppDispatch();
   const products = useAppSelector(orderedProductsSelector);
   const subTotal = useAppSelector(subTotalSelector);
@@ -106,7 +109,7 @@ export default function ShoppingCartSection() {
   const handleShippingAddress = (address: string) => {
     dispatch(updateShippingAddress(address));
   };
-  const handleOrder = async () => {
+  const handleOrderViaSSL = async () => {
     const toastId = toast.loading('Order is being placed');
     try {
       if (!user.user) {
@@ -124,8 +127,8 @@ export default function ShoppingCartSection() {
       if (cartProducts.length === 0) {
         throw new Error('Cart is empty, what are you trying to order ??');
       }
-
       let orderData;
+      let toastID = 1;
 
       if (coupon.code) {
         orderData = { ...order, coupon: coupon.code };
@@ -136,16 +139,24 @@ export default function ShoppingCartSection() {
       const res = await createOrder(orderData);
 
       if (res.success) {
-        toast.success(res.message, { id: toastId });
+        toast.success(res.message, { id: toastID });
         dispatch(clearCart());
         router.push(res.data.paymentUrl);
       }
 
       if (!res.success) {
-        toast.error(res.message, { id: toastId });
+        toast.error(res.message, { id: toastID });
       }
     } catch (error: any) {
       toast.error(error.message, { id: toastId });
+    }
+  };
+
+  const handleOrder = async () => {
+    try {
+      setPaymentOption(1);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -548,10 +559,7 @@ export default function ShoppingCartSection() {
                 <Button
                   onClick={handleOrder}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
-                  //   disabled={
-                  //     cartItems.length === 0 ||
-                  //     cartItems.some((item) => !item.inStock)
-                  //   }
+                  disabled={paymentOption === 1}
                 >
                   <CreditCard className="h-5 w-5 mr-2" />
                   Proceed to Checkout
@@ -567,6 +575,32 @@ export default function ShoppingCartSection() {
             </Card>
 
             {/* Benefits */}
+            {/* paymentOption = 1 */}
+            <Card className={paymentOption === 0 ? 'hidden' : 'bg-[#155dfc]'}>
+              <CardContent className="p-4 space-y-3 ">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                    <p className="text-sm text-red-800">
+                      Please select a payment option
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4 justify-between px-8">
+                  <div className="flex border-2 cursor-pointer border-[#fff] rounded-lg px-4 py-2 flex-col items-center space-x-3 text-sm text-gray-600">
+                    <BanknoteArrowDown className="h-16 w-16 text-white" />
+                    <span className="text-white">Cash on delivery</span>
+                  </div>
+                  <div
+                    onClick={handleOrderViaSSL}
+                    className="flex border-2 cursor-pointer border-[#fff] rounded-lg px-4 py-2 flex-col items-center space-x-3 text-sm text-gray-600"
+                  >
+                    <BadgeDollarSign className="h-16 w-16 text-white" />
+                    <span className="text-white">SSL Commerz</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center space-x-3 text-sm text-gray-600">

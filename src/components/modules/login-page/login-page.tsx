@@ -38,8 +38,11 @@ const LoginPageComponent = () => {
     if (type === 'user') {
       setValue('email', 'shaun.mononsoft@gmail.com');
       setValue('password', 'password');
-    } else {
+    } else if (type === 'admin') {
       setValue('email', 'admin@gmail.com');
+      setValue('password', 'password');
+    } else {
+      setValue('email', 'agent@gmail.com');
       setValue('password', 'password');
     }
   };
@@ -117,6 +120,13 @@ const LoginPageComponent = () => {
               className="bg-cyan-400 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 py-3"
             >
               Sign In with Admin
+            </Button>
+            <Button
+              onClick={() => setCredentialMethod('agent')}
+              variant="default"
+              className="bg-[#8E7AFE] hover:bg-[#4D2DFC] text-white flex items-center justify-center gap-2 py-3"
+            >
+              Sign In with Agent
             </Button>
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>

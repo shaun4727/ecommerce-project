@@ -1,9 +1,17 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
+/** @type {import('tailwindcss').Config} */
+import tailwindcssAnimate from 'tailwindcss-animate';
 
-module.exports = {
+const config = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
+    './app/**/*.{ts,tsx}',
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
-  theme: {},
+  theme: {
+    extend: {},
+  },
+  plugins: [tailwindcssAnimate],
 };
+
+export default config;

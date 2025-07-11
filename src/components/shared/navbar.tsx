@@ -115,6 +115,8 @@ export default function NavbarComponent() {
   const dashboardHandler = () => {
     if (user?.role === 'user') {
       router.push('/user/dashboard');
+    } else if (user?.role === 'agent') {
+      router.push('/agent/dashboard');
     } else {
       router.push('/admin/dashboard');
     }
@@ -221,15 +223,17 @@ export default function NavbarComponent() {
           </div>
 
           {/* Cart */}
-          <div
-            className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded cursor-pointer"
-            onClick={() => router.push('/cart')}
-          >
-            <ShoppingCart className="h-5 w-5" />
-            <div className="bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-              {cartProducts.length}
-            </div>
-            <span className="font-semibold">CART - BDT {grandTotal}</span>
+          <div className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded cursor-pointer">
+            <Link href="/cart" className="flex gap-2">
+              {' '}
+              <ShoppingCart className="h-5 w-5" />
+              <div className="bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                {cartProducts.length}
+              </div>
+              <span className="font-semibold">
+                CART - BDT {Number(grandTotal).toFixed(2)}
+              </span>
+            </Link>
           </div>
         </div>
       </div>
