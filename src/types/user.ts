@@ -71,4 +71,5 @@ export interface IOrderData {
   totalAmount: number;
   finalAmount: number;
   createdAt: string | number | Date;
+  coupon?: string;
 }

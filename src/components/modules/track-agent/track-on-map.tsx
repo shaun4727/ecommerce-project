@@ -40,7 +40,7 @@ const TrackAgentOnDelivery: React.FC = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          map.setZoom(18);
+          map.setZoom(14);
         }
       );
     }
@@ -52,17 +52,29 @@ const TrackAgentOnDelivery: React.FC = () => {
     console.log('polyline: ', polyline);
   };
 
-  const path = [
-    { lat: 23.7806, lng: 90.407 }, // Shahbagh
-    { lat: 23.774, lng: 90.3654 }, // Dhanmondi
-    { lat: 23.7614, lng: 90.429 }, // Badda
-    { lat: 23.7465, lng: 90.376 }, // New Market
+  //   const path = [
+  //     // { lat: 23.7806, lng: 90.407 }, // Shahbagh
+  //     // { lat: 23.774, lng: 90.3654 }, // Dhanmondi
+  //     // { lat: 23.7614, lng: 90.429 }, // Badda
+  //     // { lat: 23.7465, lng: 90.376 }, // New Market
+  //     { lat: 23.780048010192353, lng: 90.39943694233332 }, // mohakhali kacha bazar
+  //     { lat: 23.753338836891928, lng: 90.39943694233332 }, // JMI extension
+  //   ];
+
+  const testPath = [
+    { lat: 23.780048010192353, lng: 90.39873861913912 }, // Mohakhali Flyover start
+    { lat: 23.773911203285273, lng: 90.40143170405953 }, // Near Govt. Science College
+    { lat: 23.770788907464315, lng: 90.40115275433233 }, // Tejgaon College area
+    { lat: 23.76986595032364, lng: 90.40098109296174 }, // Farmgate Flyover North
+    { lat: 23.767568347726048, lng: 90.40048756652133 }, // Farmgate center
+    { lat: 23.76298321335498, lng: 90.39991223408825 }, // Green Road area
+    { lat: 23.753338836891928, lng: 90.39943694233332 },
   ];
 
   const options = {
     strokeColor: '#FF0000',
     strokeOpacity: 0.8,
-    strokeWeight: 2,
+    strokeWeight: 6,
     fillColor: '#FF0000',
     fillOpacity: 0.35,
     clickable: false,
@@ -99,7 +111,7 @@ const TrackAgentOnDelivery: React.FC = () => {
           )}
         </GoogleMarkerClusterer> */}
 
-        <PolylineF onLoad={onLoadPolyLine} path={path} options={options} />
+        <PolylineF onLoad={onLoadPolyLine} path={testPath} options={options} />
       </GoogleMap>
     </div>
   ) : (

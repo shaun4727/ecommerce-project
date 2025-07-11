@@ -238,16 +238,16 @@ export default function TopBrands({
 
           {/* Tablet Grid */}
           <div className="hidden md:grid lg:hidden grid-cols-3 gap-6">
-            {allBrands
-              ?.slice(0, 6)
-              .map((brand) => <BrandCard key={brand._id} brand={brand} />)}
+            {allBrands?.slice(0, 6).map((brand) => (
+              <BrandCard key={brand._id} brand={brand} />
+            ))}
           </div>
 
           {/* Mobile Grid */}
           <div className="md:hidden grid grid-cols-2 gap-4">
-            {allBrands
-              ?.slice(0, 4)
-              .map((brand) => <BrandCard key={brand._id} brand={brand} />)}
+            {allBrands?.slice(0, 4).map((brand) => (
+              <BrandCard key={brand._id} brand={brand} />
+            ))}
           </div>
         </div>
 

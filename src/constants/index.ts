@@ -7,4 +7,16 @@ export const protectedRoutes = [
   '/user/:page',
   '/agent',
   '/agent/:page',
+  '/track-agent',
 ];
+
+export const orderType = {
+  ssl: 'SSL',
+  cod: 'COD',
+};
+
+export const orderAssignedStatus = {
+  picked: 'Picked',
+  delivered: 'Delivered',
+  assigned: 'Assigned',
+};

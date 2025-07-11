@@ -18,6 +18,7 @@ interface InitialState {
     isLoading: boolean;
     error: string;
   };
+  paymentMethod: string;
 }
 
 const initialState: InitialState = {
@@ -31,6 +32,7 @@ const initialState: InitialState = {
     isLoading: false,
     error: '',
   },
+  paymentMethod: '',
 };
 
 export const fetchCoupon = createAsyncThunk(
@@ -115,6 +117,9 @@ const cartSlice = createSlice({
       state.city = '';
       state.shippingAddress = '';
     },
+    updatePaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCoupon.pending, (state) => {
@@ -150,7 +155,7 @@ export const orderSelector = (state: RootState) => {
       color: 'White',
     })),
     shippingAddress: `${state.cart.shippingAddress} - ${state.cart.city}`,
-    paymentMethod: 'Online',
+    paymentMethod: state.cart.paymentMethod,
   };
 };
 
@@ -222,5 +227,6 @@ export const {
   updateCity,
   updateShippingAddress,
   clearCart,
+  updatePaymentMethod,
 } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -76,13 +76,7 @@ const UserData = {
       isActive: true,
       isCollapsible: false,
     },
-    {
-      title: 'Order Status',
-      url: '/user/order-status',
-      icon: SquareTerminal,
-      isActive: true,
-      isCollapsible: false,
-    },
+
     {
       title: 'Shop',
       url: '/admin/shop/products',

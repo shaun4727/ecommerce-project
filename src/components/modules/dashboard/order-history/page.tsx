@@ -16,9 +16,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -426,6 +437,12 @@ export default function OrderHistoryAdmin() {
                       ))}
                   </div>
                 </TableHead>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort('total')}
+                >
+                  <div className="flex items-center">Assign</div>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -442,13 +459,67 @@ export default function OrderHistoryAdmin() {
                     className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                   >
                     <TableCell className="font-medium">#{order._id}</TableCell>
-                    <TableCell>{formatDate(order.createdAt)}</TableCell>
+                    <TableCell>
+                      {new Intl.DateTimeFormat('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      }).format(new Date(order.createdAt))}
+                    </TableCell>
+                    {/* <TableCell>{order.createdAt}</TableCell> */}
                     <TableCell>{order.user.name}</TableCell>
                     <TableCell>
                       <PaymentBadge status={order.status} />
                     </TableCell>
                     <TableCell>
                       BDT {Number(order.totalAmount).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <Drawer>
+                        <DrawerTrigger asChild>
+                          <Button variant="outline">Assign Agent</Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                          <div className="mx-auto w-full max-w-sm">
+                            <DrawerHeader>
+                              <DrawerTitle>Select Agent</DrawerTitle>
+                            </DrawerHeader>
+                            <div className="p-4 pb-0 flex justify-center">
+                              <Select>
+                                <SelectTrigger className="w-[330px]">
+                                  <SelectValue placeholder="Select an Agent" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Fruits</SelectLabel>
+                                    <SelectItem value="apple">Apple</SelectItem>
+                                    <SelectItem value="banana">
+                                      Banana
+                                    </SelectItem>
+                                    <SelectItem value="blueberry">
+                                      Blueberry
+                                    </SelectItem>
+                                    <SelectItem value="grapes">
+                                      Grapes
+                                    </SelectItem>
+                                    <SelectItem value="pineapple">
+                                      Pineapple
+                                    </SelectItem>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <DrawerFooter>
+                              <div className="flex flex-row justify-center gap-4">
+                                <Button>Submit</Button>
+                                <DrawerClose asChild>
+                                  <Button variant="outline">Cancel</Button>
+                                </DrawerClose>
+                              </div>
+                            </DrawerFooter>
+                          </div>
+                        </DrawerContent>
+                      </Drawer>
                     </TableCell>
                   </TableRow>
                 ))

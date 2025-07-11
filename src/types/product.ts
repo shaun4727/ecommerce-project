@@ -35,4 +35,14 @@ export interface IProduct {
   createdAt: string;
   updatedAt: string;
   offerPrice: number;
+  orderQuantity?: number;
+}
+
+export interface IStep {
+  id: number;
+  title: string;
+  subtitle: string;
+  icon: string; // Specific type for Lucide icons
+  completed: boolean;
+  active: boolean;
 }

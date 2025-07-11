@@ -85,7 +85,7 @@ export default function HeroSection() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src={currentHero.image || '/placeholder.svg'}
+            src={currentHero?.image || '/placeholder.svg'}
             alt={currentHero.title}
             fill
             className="object-cover"

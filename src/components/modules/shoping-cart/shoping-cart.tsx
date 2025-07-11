@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { orderType } from '@/constants';
 import { cities } from '@/constants/cities';
 import { useUser } from '@/context/UserContext';
 import { currencyFormatter } from '@/lib/currencyFormatters';
@@ -51,10 +52,12 @@ import {
   shopSelector,
   subTotalSelector,
   updateCity,
+  updatePaymentMethod,
   updateShippingAddress,
 } from '@/redux/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createOrder } from '@/service/cart';
+import { IProduct } from '@/types';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -109,29 +112,38 @@ export default function ShoppingCartSection() {
   const handleShippingAddress = (address: string) => {
     dispatch(updateShippingAddress(address));
   };
-  const handleOrderViaSSL = async () => {
+
+  const validationMsgsOnOrder = () => {
+    if (!user.user) {
+      router.push('/login');
+      throw new Error('Please login first.');
+    }
+
+    if (!city) {
+      throw new Error('City is missing');
+    }
+    if (!shippingAddress) {
+      throw new Error('Shipping address is missing');
+    }
+
+    if (cartProducts.length === 0) {
+      throw new Error('Cart is empty, what are you trying to order ??');
+    }
+  };
+
+  const handleOrderViaSSLorCOD = async (type: string) => {
     const toastId = toast.loading('Order is being placed');
+
     try {
-      if (!user.user) {
-        router.push('/login');
-        throw new Error('Please login first.');
-      }
-
-      if (!city) {
-        throw new Error('City is missing');
-      }
-      if (!shippingAddress) {
-        throw new Error('Shipping address is missing');
-      }
-
-      if (cartProducts.length === 0) {
-        throw new Error('Cart is empty, what are you trying to order ??');
+      if (type === orderType.cod) {
+        dispatch(updatePaymentMethod('cod'));
+      } else {
+        dispatch(updatePaymentMethod('Online'));
       }
       let orderData;
       let toastID = 1;
-
       if (coupon.code) {
-        orderData = { ...order, coupon: coupon.code };
+        orderData = { ...order, coupon: coupon.code, OrderType: type };
       } else {
         orderData = order;
       }
@@ -141,7 +153,7 @@ export default function ShoppingCartSection() {
       if (res.success) {
         toast.success(res.message, { id: toastID });
         dispatch(clearCart());
-        router.push(res.data.paymentUrl);
+        router.push('/user/order-history');
       }
 
       if (!res.success) {
@@ -154,9 +166,11 @@ export default function ShoppingCartSection() {
 
   const handleOrder = async () => {
     try {
+      validationMsgsOnOrder();
       setPaymentOption(1);
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
+      toast.error(err.message, { id: 0 });
     }
   };
 
@@ -211,7 +225,7 @@ export default function ShoppingCartSection() {
                 Shopping Cart
               </h1>
               <p className="text-gray-600">
-                {cartProducts.length} items in your cart
+                {cartProducts.length ?? '0'} items in your cart
               </p>
             </div>
           </div>
@@ -244,7 +258,7 @@ export default function ShoppingCartSection() {
                 </CardContent>
               </Card>
             ) : (
-              products.map((item, index) => (
+              products.map((item: IProduct, index) => (
                 <Card
                   key={index}
                   className="hover:shadow-md transition-shadow duration-200"
@@ -337,7 +351,8 @@ export default function ShoppingCartSection() {
                                 //   updateQuantity(item.id, item.quantity + 1)
                                 // }
                                 disabled={
-                                  item.orderQuantity >= item.stock ||
+                                  (item.orderQuantity &&
+                                    item.orderQuantity >= item.stock) ||
                                   !item.stock
                                 }
                                 className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
@@ -350,7 +365,9 @@ export default function ShoppingCartSection() {
                           {/* Item Total */}
                           <div className="text-right">
                             <span className="text-lg font-semibold text-gray-900">
-                              ${(item.price * item.orderQuantity).toFixed(2)}
+                              $
+                              {item.orderQuantity &&
+                                (item.price * item.orderQuantity).toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -587,12 +604,15 @@ export default function ShoppingCartSection() {
                   </div>
                 </div>
                 <div className="flex gap-4 justify-between px-8">
-                  <div className="flex border-2 cursor-pointer border-[#fff] rounded-lg px-4 py-2 flex-col items-center space-x-3 text-sm text-gray-600">
+                  <div
+                    onClick={() => handleOrderViaSSLorCOD(orderType.cod)}
+                    className="flex border-2 cursor-pointer border-[#fff] rounded-lg px-4 py-2 flex-col items-center space-x-3 text-sm text-gray-600"
+                  >
                     <BanknoteArrowDown className="h-16 w-16 text-white" />
                     <span className="text-white">Cash on delivery</span>
                   </div>
                   <div
-                    onClick={handleOrderViaSSL}
+                    onClick={() => handleOrderViaSSLorCOD(orderType.ssl)}
                     className="flex border-2 cursor-pointer border-[#fff] rounded-lg px-4 py-2 flex-col items-center space-x-3 text-sm text-gray-600"
                   >
                     <BadgeDollarSign className="h-16 w-16 text-white" />

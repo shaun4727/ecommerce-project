@@ -71,7 +71,7 @@ export default function NavbarComponent() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
 
-  const { user, setIsLoading, isLoading } = useUser();
+  const { user, setIsLoading, setUser, isLoading } = useUser();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -81,11 +81,17 @@ export default function NavbarComponent() {
     setIsClient(true);
     getCategoriesMethod();
   }, [cartProducts]);
-  const handleLogout = () => {
-    logout();
-    setIsLoading(true);
-    if (protectedRoutes.some((route) => pathname.match(route))) {
-      router.push('/');
+  const handleLogout = async () => {
+    try {
+      const res = await logout();
+      if (res === true) {
+        setUser(null);
+        if (protectedRoutes.some((route) => pathname.match(route))) {
+          router.push('/');
+        }
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

@@ -3,6 +3,7 @@ export interface IOrder {
   coupon?: string;
   shippingAddress: string;
   paymentMethod: string;
+  OrderType?: string;
 }
 
 export interface IOrderProduct {
