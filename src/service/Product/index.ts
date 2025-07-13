@@ -1,4 +1,5 @@
 'use server';
+import { IAgentOrder } from '@/types';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -148,5 +149,25 @@ export const getFlashSaleProductsApi = async () => {
     return data;
   } catch (error: any) {
     return Error(error.message);
+  }
+};
+
+export const assignAgentApi = async (formData: IAgentOrder) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/assign-agent`,
+      {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    return Error(err.message);
   }
 };

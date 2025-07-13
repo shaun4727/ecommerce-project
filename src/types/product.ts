@@ -1,3 +1,5 @@
+import { IUser } from './user';
+
 type Specification = {
   processor: string;
   ram: string;
@@ -45,4 +47,14 @@ export interface IStep {
   icon: string; // Specific type for Lucide icons
   completed: boolean;
   active: boolean;
+}
+
+export interface IAgentOrder {
+  _id: string;
+  orderId: string;
+  destination: string;
+  agentId: string | IUser;
+  status: 'Picked' | 'Delivered' | 'Assigned';
+  createdAt: string;
+  updatedAt: string;
 }

@@ -1,3 +1,5 @@
+import { IAgentOrder } from './product';
+
 export interface IUser {
   userId: string;
   name: string;
@@ -7,6 +9,9 @@ export interface IUser {
   role: 'user' | 'admin' | 'agent';
   iat?: number;
   exp?: number;
+  picked?: boolean;
+  createdAt?: string;
+  _id: string;
 }
 
 export interface IProfileData {
@@ -28,6 +33,7 @@ export interface IProfileData {
 
 export interface IOrderData {
   _id: string;
+  assigned: IAgentOrder | null;
   user: {
     _id: string;
     name: string;

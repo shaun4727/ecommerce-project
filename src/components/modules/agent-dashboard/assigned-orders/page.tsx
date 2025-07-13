@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  FileEdit,
-  Filter,
-  Search,
-} from 'lucide-react';
+import { CircleX, Eye, FileEdit, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
+import { Checkbox } from '@/components/ui/checkbox';
+import { Drawer, DrawerContent, DrawerHeader } from '@/components/ui/drawer';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -31,26 +25,32 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getMyOrderDetailApi } from '@/service/cart';
-import { IOrderData } from '@/types';
+import { orderAssignedStatus } from '@/constants';
+import { useUser } from '@/context/UserContext';
+import { getOrdersOfAgentApi, updateAgentPickStatusApi } from '@/service/cart';
+import { IAgentOrder } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import z from 'zod';
 
 function PaymentBadge({ status }: { status: string }) {
-  if (status === 'Success') {
+  if (status === orderAssignedStatus.delivered) {
     return (
       <Badge
         variant="outline"
         className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200"
       >
-        ● Success
+        ● {orderAssignedStatus.delivered}
       </Badge>
     );
-  } else if (status === 'Pending') {
+  } else if (status === orderAssignedStatus.picked) {
     return (
       <Badge
         variant="outline"
         className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200"
       >
-        ● Pending
+        ● {orderAssignedStatus.picked}
       </Badge>
     );
   } else {
@@ -59,7 +59,7 @@ function PaymentBadge({ status }: { status: string }) {
         variant="outline"
         className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
       >
-        ● Failed
+        ● {orderAssignedStatus.assigned}
       </Badge>
     );
   }
@@ -163,7 +163,7 @@ function formatDate(dateTime: string | number | Date) {
   });
 }
 
-function MobileOrderCard({ order }: { order: IOrderData }) {
+function MobileOrderCard({ order }: { order: IAgentOrder }) {
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
@@ -185,28 +185,16 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
         </div>
 
         <div className="grid grid-cols-2 gap-y-2 text-sm">
-          <div className="text-gray-500">Customer</div>
-          <div className="font-medium text-gray-900">{order.user.name}</div>
+          <div className="text-gray-500">Order</div>
+          <div className="font-medium text-gray-900">{order._id}</div>
 
           <div className="text-gray-500">Payment</div>
           <div>
             <PaymentBadge status={order.status} />
           </div>
 
-          <div className="text-gray-500">Total</div>
-          <div className="font-medium text-gray-900">
-            BDT {order.totalAmount.toFixed(2)}
-          </div>
-
-          <div className="text-gray-500">Items</div>
-          <div className="font-medium text-gray-900">
-            {order.products.length} items
-          </div>
-
-          <div className="text-gray-500">Fulfillment</div>
-          <div>
-            <FulfillmentBadge status={order.status} />
-          </div>
+          <div className="text-gray-500">Address</div>
+          <div className="font-medium text-gray-900">{order.destination}</div>
         </div>
       </CardContent>
     </Card>
@@ -218,18 +206,37 @@ export default function AssignedOrderHistory() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
-  const ordersPerPage = 10;
+  const [orderDetailData, setOrderDetailData] = useState<IAgentOrder[]>([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+
+  const { user } = useUser();
+
+  const deliverySchema = z.object({
+    delivered: z.boolean(),
+    paid: z.boolean(),
+  });
+
+  type deliveryFormData = z.infer<typeof deliverySchema>;
+
+  const methods = useForm<deliveryFormData>({
+    resolver: zodResolver(deliverySchema),
+    defaultValues: {
+      delivered: false,
+      paid: false,
+    },
+  });
+
+  const { control, handleSubmit, reset } = methods;
 
   useEffect(() => {
-    getUserOrderDetailMethod();
-  }, []);
+    if (user) {
+      getUserOrderDetailMethod();
+    }
+  }, [user]);
 
   const getUserOrderDetailMethod = async () => {
     try {
-      const res = await getMyOrderDetailApi();
+      const res = await getOrdersOfAgentApi(user!.userId);
       if (res.success) {
         setOrderDetailData(res.data);
       } else {
@@ -250,59 +257,13 @@ export default function AssignedOrderHistory() {
       setSortDirection('asc');
     }
   };
-
   const filteredOrders = orderDetailData.filter((order) => {
     const matchesSearch =
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-    if (filterStatus === 'all') return matchesSearch;
-    if (filterStatus === 'pending')
-      return matchesSearch && order.status === 'Pending';
-    if (filterStatus === 'success')
-      return matchesSearch && order.status === 'Success';
-    if (filterStatus === 'unfulfilled')
-      return matchesSearch && order.status === 'Unfulfilled';
-    if (filterStatus === 'fulfilled')
-      return matchesSearch && order.status === 'Fulfilled';
+      order.destination.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesSearch;
   });
-
-  const sortedOrders = [...filteredOrders].sort((a, b) => {
-    if (!sortColumn) return 0;
-
-    let comparison = 0;
-    switch (sortColumn) {
-      case 'id':
-        comparison = a._id.localeCompare(b._id);
-        break;
-      case 'date':
-        comparison =
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        break;
-      case 'customer':
-        comparison = a.user.name.localeCompare(b.user.name);
-        break;
-      case 'total':
-        comparison = a.totalAmount - b.totalAmount;
-        break;
-      case 'items':
-        comparison = a.products.length - b.products.length;
-        break;
-      default:
-        comparison = 0;
-    }
-
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
-
-  // Pagination
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = sortedOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(sortedOrders.length / ordersPerPage);
-
   if (isLoading) {
     return (
       <div className="w-full bg-white p-6">
@@ -312,6 +273,62 @@ export default function AssignedOrderHistory() {
       </div>
     );
   }
+
+  const submitDeliveryStatus = async (data: deliveryFormData) => {
+    // loginUserApi
+    let toastId: number | string = 1;
+    console.log(data);
+    try {
+      toastId = toast.loading('...Loading', {
+        id: toastId,
+      });
+      const res = { success: true, message: 'message' };
+
+      if (res?.success) {
+        reset();
+
+        toastId = toast.success('User logged in successfully!', {
+          id: toastId,
+        });
+      } else {
+        console.log(res);
+        toast.error(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    // handle login logic
+  };
+
+  const updateAgentPick = async () => {
+    let toastId = 10;
+    try {
+      toastId = toast.loading('...loading', { id: toastId }) as number;
+      const res = await updateAgentPickStatusApi(user!.userId);
+      if (res.success) {
+        toast.success('Product picked by Agent', { id: toastId });
+        await getUserOrderDetailMethod();
+        return true;
+      } else {
+        console.log(res.message);
+      }
+    } catch (err: any) {
+      console.log(err);
+      throw new err();
+    }
+  };
+
+  const openDeliveryDrawer = async () => {
+    try {
+      const res = await updateAgentPick();
+      if (res) {
+        setOpenDrawer(true);
+      }
+    } catch (err: any) {
+      console.log(err);
+      throw new Error(err);
+    }
+  };
 
   return (
     <div className="w-full bg-white p-6">
@@ -335,32 +352,16 @@ export default function AssignedOrderHistory() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <div className="flex items-center">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter status" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Orders</SelectItem>
-                <SelectItem value="pending">Payment Pending</SelectItem>
-                <SelectItem value="success">Payment Success</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Mobile View - Cards */}
         <div className="md:hidden space-y-4">
-          {currentOrders.length === 0 ? (
+          {filteredOrders.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500">No orders found</p>
             </div>
           ) : (
-            currentOrders.map((order) => (
+            filteredOrders.map((order) => (
               <MobileOrderCard key={order._id} order={order} />
             ))
           )}
@@ -371,92 +372,119 @@ export default function AssignedOrderHistory() {
           <Table>
             <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead
-                  className="w-[80px] cursor-pointer"
-                  onClick={() => handleSort('id')}
-                >
-                  <div className="flex items-center">
-                    Order
-                    {sortColumn === 'id' &&
-                      (sortDirection === 'asc' ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort('date')}
-                >
-                  <div className="flex items-center">
-                    Date
-                    {sortColumn === 'date' &&
-                      (sortDirection === 'asc' ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort('customer')}
-                >
-                  <div className="flex items-center">
-                    Customer
-                    {sortColumn === 'customer' &&
-                      (sortDirection === 'asc' ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort('total')}
-                >
-                  <div className="flex items-center">
-                    Total
-                    {sortColumn === 'total' &&
-                      (sortDirection === 'asc' ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
+                <TableHead className="w-[80px] cursor-pointer">Order</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentOrders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8">
                     No orders found
                   </TableCell>
                 </TableRow>
               ) : (
-                currentOrders.map((order, index) => (
+                filteredOrders.map((order, index) => (
                   <TableRow
                     key={order._id}
                     className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                   >
                     <TableCell className="font-medium">#{order._id}</TableCell>
-                    <TableCell>{formatDate(order.createdAt)}</TableCell>
-                    <TableCell>{order.user.name}</TableCell>
+                    <TableCell>{order.destination}</TableCell>
                     <TableCell>
                       <PaymentBadge status={order.status} />
                     </TableCell>
                     <TableCell>
-                      BDT {Number(order.totalAmount).toFixed(2)}
+                      {order.status === orderAssignedStatus.assigned && (
+                        <Button variant="default" onClick={openDeliveryDrawer}>
+                          Pick
+                        </Button>
+                      )}
+
+                      {order.status === orderAssignedStatus.picked &&
+                        'Already Picked!'}
                     </TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
+
+          <Drawer
+            direction="right"
+            open={openDrawer}
+            onOpenChange={setOpenDrawer}
+          >
+            <DrawerContent>
+              <div className="mx-auto w-full max-w-sm">
+                <DrawerHeader>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 rounded-full"
+                      onClick={() => setOpenDrawer(false)}
+                    >
+                      <CircleX />
+                    </Button>
+                  </div>
+                </DrawerHeader>
+                <div className="p-4 pb-0">
+                  <h1 className="text-lg font-bold mb-2">
+                    Update delivery status
+                  </h1>
+                  <FormProvider {...methods}>
+                    <form
+                      onSubmit={handleSubmit(submitDeliveryStatus)}
+                      className="space-y-4"
+                    >
+                      <FormField
+                        name="delivered"
+                        control={control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center gap-2">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(checked) =>
+                                  field.onChange(checked === true)
+                                }
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                              Delivery
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="paid"
+                        control={control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center gap-2">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(checked) =>
+                                  field.onChange(checked === true)
+                                }
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                              Payment Status
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="submit">Submit</Button>
+                    </form>
+                  </FormProvider>
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
     </div>

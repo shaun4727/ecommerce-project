@@ -34,6 +34,13 @@ const data = {
       isCollapsible: false,
     },
     {
+      title: 'Create Agent',
+      url: '/admin/agent-account-creation',
+      icon: SquareTerminal,
+      isActive: true,
+      isCollapsible: false,
+    },
+    {
       title: 'Shop',
       url: '/admin/shop/products',
       icon: Bot,

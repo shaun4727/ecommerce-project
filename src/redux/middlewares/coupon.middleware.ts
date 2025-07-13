@@ -19,19 +19,17 @@ export const couponMiddleware =
     ) {
       next(action);
 
-      setTimeout(() => {
-        const state: RootState = store.getState();
+      const state: RootState = store.getState();
 
-        const subTotal = subTotalSelector(state);
+      const subTotal = subTotalSelector(state);
 
-        store.dispatch(
-          fetchCoupon({
-            couponCode: state.cart.coupon.code,
-            subTotal: subTotal,
-            shopId: state.cart.shopId,
-          }) as unknown as Action
-        );
-      }, 0);
+      store.dispatch(
+        fetchCoupon({
+          couponCode: state.cart.coupon.code,
+          subTotal: subTotal,
+          shopId: state.cart.shopId,
+        }) as unknown as Action
+      );
     } else {
       next(action);
     }

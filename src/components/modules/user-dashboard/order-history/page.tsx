@@ -27,7 +27,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 import {
   Select,
@@ -228,7 +227,42 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
   );
 }
 
-export default function OrderHistory({ steps }: { steps: IStep[] }) {
+const steps = [
+  // {
+  //   id: 1,
+  //   title: 'Order made',
+  //   subtitle: 'Create order',
+  //   icon: Package,
+  //   completed: true,
+  //   active: false,
+  // },
+  {
+    id: 1,
+    title: 'Payment Detail',
+    subtitle: 'Customer payment',
+    icon: 'CreditCard',
+    completed: true,
+    active: true,
+  },
+  {
+    id: 2,
+    title: 'Shipped',
+    subtitle: 'On delivery',
+    icon: 'Truck',
+    completed: false,
+    active: false,
+  },
+  {
+    id: 3,
+    title: 'Completed',
+    subtitle: 'Order completed',
+    icon: 'CheckCircle',
+    completed: false,
+    active: false,
+  },
+];
+
+export default function OrderHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -237,11 +271,14 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [activeOrder, setActiveOrder] = useState<IOrderData | null>(null);
+
   const ordersPerPage = 10;
   type TabSwitchKey = 'productDetail' | 'shipment' | 'completed';
   const [tabSwitch, setTabSwitch] = useState<Record<TabSwitchKey, number>>({
     productDetail: 0,
-    shipment: 1,
+    shipment: 0,
     completed: 0,
   });
 
@@ -252,7 +289,7 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
   }, []);
 
   useEffect(() => {
-    setCurrentTab(steps[1]);
+    setCurrentTab(steps[0]);
   }, [steps]);
 
   const handleTrackOrder = () => {
@@ -263,6 +300,7 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
       const res = await getMyOrderDetailApi();
       if (res.success) {
         setOrderDetailData(res.data);
+        setActiveOrder(res.data[0]);
       } else {
         console.log(res);
       }
@@ -299,6 +337,17 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
 
     return matchesSearch;
   });
+
+  const getCurrentOrderStatusClass = (step: IStep) => {
+    if (currentTab === step) {
+      return 'bg-orange-500 text-white';
+    }
+    return step.completed
+      ? 'bg-orange-300 text-white'
+      : step.active
+        ? 'bg-orange-300 text-white'
+        : 'bg-gray-100 text-gray-400';
+  };
 
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     if (!sortColumn) return 0;
@@ -343,7 +392,20 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
       </div>
     );
   }
+
+  const openDrawerToCheckOrder = (order: IOrderData) => {
+    orderDtlSwitch(steps[0]);
+    setActiveOrder(order);
+    if (order.status === 'Picked') {
+      steps[1].active = true;
+    }
+    setOpenDrawer(true);
+  };
+
   const orderDtlSwitch = (step: IStep) => {
+    if (!step?.active) {
+      return;
+    }
     setCurrentTab(step);
     const resetTabs: Record<TabSwitchKey, number> = {
       productDetail: step.icon === 'CreditCard' ? 1 : 0,
@@ -645,124 +707,12 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
                       BDT {Number(order.totalAmount).toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Drawer>
-                        <DrawerTrigger asChild>
-                          <Button variant="outline">Order Status</Button>
-                        </DrawerTrigger>
-                        <DrawerContent>
-                          <div className="mx-auto w-full overflow-y-scroll">
-                            <div className="p-4 pb-0">
-                              <DrawerHeader>
-                                <DrawerTitle>
-                                  {' '}
-                                  Order ID: TXNID983274
-                                </DrawerTitle>
-                              </DrawerHeader>
-                              <div className="mb-6">
-                                <p className="text-sm sm:text-base text-gray-600">
-                                  Let's boost your sales with powerful insights
-                                  and effective strategies today
-                                </p>
-                              </div>
-
-                              {/* Status Banner */}
-                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                                <div className="flex items-center mb-2 sm:mb-0">
-                                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                                  <span className="text-sm sm:text-base font-medium text-gray-900">
-                                    With courier en route
-                                  </span>
-                                </div>
-                                <span className="text-sm text-gray-600 ml-5 sm:ml-0">
-                                  No Resi: 34u2394y239y
-                                </span>
-                              </div>
-
-                              <div className="mb-8">
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                                  {steps.map((step, index) => {
-                                    let IconComponent;
-                                    if (step.icon === 'CheckCircle') {
-                                      IconComponent = CheckCircle;
-                                    } else if (step.icon === 'Truck') {
-                                      IconComponent = Truck;
-                                    } else {
-                                      IconComponent = CreditCard;
-                                    }
-                                    return (
-                                      <div
-                                        key={step.id}
-                                        className="flex items-center sm:flex-col sm:items-center sm:text-center flex-1"
-                                      >
-                                        <div
-                                          onClick={() => orderDtlSwitch(step)}
-                                          className="flex items-center sm:flex-col sm:items-center"
-                                        >
-                                          <div
-                                            className={`
-                    w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center mr-3 sm:mr-0 sm:mb-3
-                    ${
-                      step.completed
-                        ? 'bg-orange-500 text-white'
-                        : step.active
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 text-gray-400'
-                    }
-                  `}
-                                          >
-                                            <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
-                                          </div>
-                                          <div className="sm:text-center">
-                                            <h3
-                                              className={`
-                      text-sm sm:text-base font-medium
-                      ${step.completed || step.active ? 'text-gray-900' : 'text-gray-400'}
-                    `}
-                                            >
-                                              {step.title}
-                                            </h3>
-                                            <p
-                                              className={`
-                      text-xs sm:text-sm
-                      ${step.completed || step.active ? 'text-gray-600' : 'text-gray-400'}
-                    `}
-                                            >
-                                              {step.subtitle}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        {/* Connection line for mobile */}
-                                        {index < steps.length - 1 && (
-                                          <div className="hidden sm:block flex-1 h-px bg-gray-200 mx-4"></div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              {/* Shipping Addresses */}
-
-                              {getTabDetail(order)}
-                            </div>
-                            <DrawerFooter>
-                              {tabSwitch.shipment === 1 && (
-                                <div className="flex justify-center">
-                                  <Button
-                                    className="w-md"
-                                    onClick={handleTrackOrder}
-                                  >
-                                    Track Order
-                                  </Button>
-                                </div>
-                              )}
-                              {/* <DrawerClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                              </DrawerClose> */}
-                            </DrawerFooter>
-                          </div>
-                        </DrawerContent>
-                      </Drawer>
+                      <Button
+                        variant="outline"
+                        onClick={() => openDrawerToCheckOrder(order)}
+                      >
+                        Order Status
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -770,6 +720,109 @@ export default function OrderHistory({ steps }: { steps: IStep[] }) {
             </TableBody>
           </Table>
         </div>
+        <Drawer open={openDrawer} onOpenChange={setOpenDrawer}>
+          <DrawerContent>
+            <div className="mx-auto w-full overflow-y-scroll">
+              <div className="p-4 pb-0">
+                <DrawerHeader>
+                  <DrawerTitle> Order ID: TXNID983274</DrawerTitle>
+                </DrawerHeader>
+                <div className="mb-6">
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Let's boost your sales with powerful insights and effective
+                    strategies today
+                  </p>
+                </div>
+
+                {/* Status Banner */}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="flex items-center mb-2 sm:mb-0">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                    <span className="text-sm sm:text-base font-medium text-gray-900">
+                      With courier en route
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-600 ml-5 sm:ml-0">
+                    No Resi: 34u2394y239y
+                  </span>
+                </div>
+
+                <div className="mb-8">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    {steps.map((step, index) => {
+                      let IconComponent;
+                      if (step.icon === 'CheckCircle') {
+                        IconComponent = CheckCircle;
+                      } else if (step.icon === 'Truck') {
+                        IconComponent = Truck;
+                      } else {
+                        IconComponent = CreditCard;
+                      }
+                      return (
+                        <div
+                          key={step.id}
+                          className="flex items-center sm:flex-col sm:items-center sm:text-center flex-1"
+                        >
+                          <div
+                            onClick={() => orderDtlSwitch(step)}
+                            className="flex items-center sm:flex-col sm:items-center"
+                          >
+                            <div
+                              className={`
+                    w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center mr-3 sm:mr-0 sm:mb-3
+                    ${getCurrentOrderStatusClass(step)}
+                  `}
+                            >
+                              <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
+                            </div>
+                            <div className="sm:text-center">
+                              <h3
+                                className={`
+                      text-sm sm:text-base font-medium
+                      ${step.completed || step.active ? 'text-gray-900' : 'text-gray-400'}
+                    `}
+                              >
+                                {step.title}
+                              </h3>
+                              <p
+                                className={`
+                      text-xs sm:text-sm
+                      ${step.completed || step.active ? 'text-gray-600' : 'text-gray-400'}
+                    `}
+                              >
+                                {step.subtitle}
+                              </p>
+                            </div>
+                          </div>
+                          {/* Connection line for mobile */}
+                          {index < steps.length - 1 && (
+                            <div className="hidden sm:block flex-1 h-px bg-gray-200 mx-4"></div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Shipping Addresses */}
+
+                {getTabDetail(activeOrder as IOrderData)}
+              </div>
+              <DrawerFooter>
+                {tabSwitch.shipment === 1 && (
+                  <div className="flex justify-center">
+                    <Button className="w-md" onClick={handleTrackOrder}>
+                      Track Order
+                    </Button>
+                  </div>
+                )}
+                {/* <DrawerClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                              </DrawerClose> */}
+              </DrawerFooter>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
     </div>
   );

@@ -19,10 +19,8 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 import {
   Select,
@@ -42,8 +40,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { orderAssignedStatus } from '@/constants';
 import { getMyShopOrdersApi } from '@/service/cart';
-import { IOrderData } from '@/types';
+import { assignAgentApi } from '@/service/Product';
+import { IAgentOrder, IOrderData, IUser } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import z from 'zod';
 
 function PaymentBadge({ status }: { status: string }) {
   if (status === 'Success') {
@@ -224,7 +228,7 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
   );
 }
 
-export default function OrderHistoryAdmin() {
+export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
   const [isLoading, setIsLoading] = useState(true);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -232,7 +236,66 @@ export default function OrderHistoryAdmin() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
+  const [open, setOpen] = useState<boolean>(false);
+  const [selectedOrderForAgent, setSelectedOrderForAgent] =
+    useState<IOrderData | null>(null);
   const ordersPerPage = 10;
+
+  /**
+   * Assigning agent to order
+   */
+  const registerSchema = z.object({
+    agent: z.string().min(1, 'Agent is required'),
+  });
+
+  type registerFormData = z.infer<typeof registerSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<registerFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+  const onSubmit = async (data: registerFormData) => {
+    let toastId: number | string = 1;
+
+    try {
+      toastId = toast.loading('...Loading', {
+        id: toastId,
+      });
+
+      const formData = {
+        orderId: selectedOrderForAgent?._id,
+        destination: selectedOrderForAgent?.shippingAddress,
+        agentId: data.agent,
+        status: orderAssignedStatus.assigned,
+      };
+      const res = await assignAgentApi(formData as IAgentOrder);
+
+      if (res?.success) {
+        reset();
+        setSelectedOrderForAgent(null);
+        await getUserOrderDetailMethod();
+        setOpen(false);
+        toastId = toast.success(res.message, {
+          id: toastId,
+        });
+      } else {
+        console.log(res);
+        toast.error(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    // handle login logic
+  };
+
+  const selectedOrder = (order: IOrderData) => {
+    setOpen(true);
+    setSelectedOrderForAgent(order);
+  };
 
   useEffect(() => {
     getUserOrderDetailMethod();
@@ -307,6 +370,17 @@ export default function OrderHistoryAdmin() {
 
     return sortDirection === 'asc' ? comparison : -comparison;
   });
+
+  const getAgentInfo = (order: IOrderData) => {
+    if (order && order.assigned && typeof order.assigned.agentId !== 'string') {
+      return order.assigned.agentId.name;
+    }
+    return (
+      <Button variant="outline" onClick={() => selectedOrder(order)}>
+        Assign Agent
+      </Button>
+    );
+  };
 
   // Pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -475,48 +549,63 @@ export default function OrderHistoryAdmin() {
                       BDT {Number(order.totalAmount).toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Drawer>
-                        <DrawerTrigger asChild>
-                          <Button variant="outline">Assign Agent</Button>
-                        </DrawerTrigger>
+                      {getAgentInfo(order)}
+                      <Drawer open={open} onOpenChange={setOpen}>
                         <DrawerContent>
-                          <div className="mx-auto w-full max-w-sm">
+                          <div
+                            className="mx-auto w-full max-w-sm"
+                            key={order._id}
+                          >
                             <DrawerHeader>
                               <DrawerTitle>Select Agent</DrawerTitle>
                             </DrawerHeader>
                             <div className="p-4 pb-0 flex justify-center">
-                              <Select>
-                                <SelectTrigger className="w-[330px]">
-                                  <SelectValue placeholder="Select an Agent" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>Fruits</SelectLabel>
-                                    <SelectItem value="apple">Apple</SelectItem>
-                                    <SelectItem value="banana">
-                                      Banana
-                                    </SelectItem>
-                                    <SelectItem value="blueberry">
-                                      Blueberry
-                                    </SelectItem>
-                                    <SelectItem value="grapes">
-                                      Grapes
-                                    </SelectItem>
-                                    <SelectItem value="pineapple">
-                                      Pineapple
-                                    </SelectItem>
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
+                              <form
+                                role="form"
+                                onSubmit={handleSubmit(onSubmit)}
+                              >
+                                <Select
+                                  {...register('agent')}
+                                  onValueChange={(value) => {
+                                    // set value in react-hook-form
+                                    reset({ agent: value });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[330px]">
+                                    <SelectValue placeholder="Select an Agent" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectLabel>Agents</SelectLabel>
+                                      {agents
+                                        .filter(
+                                          (agent: IUser) =>
+                                            agent.role === 'agent'
+                                        )
+                                        .map(
+                                          (
+                                            filteredAgent: IUser,
+                                            idx: number
+                                          ) => (
+                                            <SelectItem
+                                              key={filteredAgent._id}
+                                              value={String(filteredAgent._id)}
+                                            >
+                                              {filteredAgent.name}
+                                            </SelectItem>
+                                          )
+                                        )}
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                                <div className="flex flex-row justify-center gap-4 my-4">
+                                  <Button>Submit</Button>
+                                  <DrawerClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                  </DrawerClose>
+                                </div>
+                              </form>
                             </div>
-                            <DrawerFooter>
-                              <div className="flex flex-row justify-center gap-4">
-                                <Button>Submit</Button>
-                                <DrawerClose asChild>
-                                  <Button variant="outline">Cancel</Button>
-                                </DrawerClose>
-                              </div>
-                            </DrawerFooter>
                           </div>
                         </DrawerContent>
                       </Drawer>

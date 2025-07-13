@@ -1,9 +1,11 @@
 import OrderHistoryAdmin from '@/components/modules/dashboard/order-history/page';
+import { getAllUsersApi } from '@/service/AuthService';
 
-export default function OrderHistoryAdminPage() {
+export default async function OrderHistoryAdminPage() {
+  const res = (await getAllUsersApi()).data;
   return (
     <div>
-      <OrderHistoryAdmin />
+      <OrderHistoryAdmin agents={res} />
     </div>
   );
 }

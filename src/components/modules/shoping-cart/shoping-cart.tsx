@@ -136,7 +136,7 @@ export default function ShoppingCartSection() {
 
     try {
       if (type === orderType.cod) {
-        dispatch(updatePaymentMethod('cod'));
+        dispatch(updatePaymentMethod('COD'));
       } else {
         dispatch(updatePaymentMethod('Online'));
       }
@@ -154,6 +154,8 @@ export default function ShoppingCartSection() {
         toast.success(res.message, { id: toastID });
         dispatch(clearCart());
         router.push('/user/order-history');
+      } else {
+        console.log(res);
       }
 
       if (!res.success) {
@@ -425,7 +427,10 @@ export default function ShoppingCartSection() {
                     >
                       City *
                     </Label>
-                    <Select onValueChange={(city) => handleCitySelect(city)}>
+                    <Select
+                      value={city}
+                      onValueChange={(city) => handleCitySelect(city)}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select your city" />
                       </SelectTrigger>
@@ -465,6 +470,7 @@ export default function ShoppingCartSection() {
                   </Label>
                   <Textarea
                     id="address"
+                    value={shippingAddress}
                     onChange={(e) => handleShippingAddress(e.target.value)}
                     placeholder="Enter your complete street address including apartment, suite, or building number"
                     className="w-full min-h-[100px] resize-none"

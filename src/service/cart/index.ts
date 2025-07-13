@@ -122,6 +122,28 @@ export const getMyOrderDetailApi = async () => {
   }
 };
 
+export const getOrdersOfAgentApi = async (agentId: string) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/agent-orders/${agentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+        next: {
+          tags: ['AgentOrders'],
+        },
+      }
+    );
+
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
 export const getMyShopOrdersApi = async () => {
   try {
     const res = await fetch(
@@ -135,6 +157,25 @@ export const getMyShopOrdersApi = async () => {
       }
     );
 
+    return await res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const updateAgentPickStatusApi = async (agentId: string) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/user/update-agent-status/${agentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    revalidateTag('AgentOrders');
     return await res.json();
   } catch (error: any) {
     return Error(error);
