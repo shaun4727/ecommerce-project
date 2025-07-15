@@ -1,5 +1,5 @@
 import { addCoupon } from '@/service/cart';
-import { IProduct } from '@/types';
+import { IAgentOrder, IProduct } from '@/types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
@@ -9,8 +9,12 @@ export interface CartProduct extends IProduct {
 
 interface InitialState {
   products: CartProduct[];
-  city: string;
-  shippingAddress: string;
+  shippingAddress: {
+    area: string;
+    city: string;
+    zip_code: string;
+    street_or_building_name: string;
+  };
   shopId: string;
   coupon: {
     code: string;
@@ -19,12 +23,17 @@ interface InitialState {
     error: string;
   };
   paymentMethod: string;
+  pickedOrder: IAgentOrder;
 }
 
 const initialState: InitialState = {
   products: [],
-  city: '',
-  shippingAddress: '',
+  shippingAddress: {
+    area: '',
+    city: '',
+    zip_code: '',
+    street_or_building_name: '',
+  },
   shopId: '',
   coupon: {
     code: '',
@@ -33,6 +42,20 @@ const initialState: InitialState = {
     error: '',
   },
   paymentMethod: '',
+  pickedOrder: {
+    _id: '',
+    orderId: '',
+    destination: {
+      city: '',
+      area: '',
+      zip_code: '',
+      street_or_building_name: '',
+    },
+    agentId: '',
+    status: 'Assigned',
+    createdAt: '',
+    updatedAt: '',
+  },
 };
 
 export const fetchCoupon = createAsyncThunk(
@@ -106,19 +129,40 @@ const cartSlice = createSlice({
         (product) => product._id !== action.payload
       );
     },
-    updateCity: (state, action) => {
-      state.city = action.payload;
-    },
     updateShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
     },
     clearCart: (state) => {
       state.products = [];
-      state.city = '';
-      state.shippingAddress = '';
+
+      state.shippingAddress = {
+        area: '',
+        city: '',
+        zip_code: '',
+        street_or_building_name: '',
+      };
     },
     updatePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
+    },
+    assignPickedOrder: (state, action) => {
+      state.pickedOrder = action.payload;
+    },
+    clearPickedOrder: (state) => {
+      state.pickedOrder = {
+        _id: '',
+        orderId: '',
+        destination: {
+          area: '',
+          city: '',
+          zip_code: '',
+          street_or_building_name: '',
+        },
+        agentId: '',
+        status: 'Assigned',
+        createdAt: '',
+        updatedAt: '',
+      };
     },
   },
   extraReducers: (builder) => {
@@ -154,7 +198,7 @@ export const orderSelector = (state: RootState) => {
       quantity: product.orderQuantity,
       color: 'White',
     })),
-    shippingAddress: `${state.cart.shippingAddress} - ${state.cart.city}`,
+    shippingAddress: state.cart.shippingAddress,
     paymentMethod: state.cart.paymentMethod,
   };
 };
@@ -177,14 +221,14 @@ export const subTotalSelector = (state: RootState) => {
 
 export const shippingCostSelector = (state: RootState) => {
   if (
-    state.cart.city &&
-    state.cart.city === 'Dhaka' &&
+    state.cart.shippingAddress.city &&
+    state.cart.shippingAddress.city === 'Dhaka' &&
     state.cart.products.length > 0
   ) {
     return 60;
   } else if (
-    state.cart.city &&
-    state.cart.city !== 'Dhaka' &&
+    state.cart.shippingAddress.city &&
+    state.cart.shippingAddress.city !== 'Dhaka' &&
     state.cart.products.length > 0
   ) {
     return 120;
@@ -211,12 +255,12 @@ export const discountAmountSelector = (state: RootState) => {
 
 //* Address
 
-export const citySelector = (state: RootState) => {
-  return state.cart.city;
-};
-
 export const shippingAddressSelector = (state: RootState) => {
   return state.cart.shippingAddress;
+};
+
+export const pickedOrderSelector = (state: RootState) => {
+  return state.cart.pickedOrder;
 };
 
 export const {
@@ -224,9 +268,11 @@ export const {
   incrementOrderQuantity,
   decrementOrderQuantity,
   removeProduct,
-  updateCity,
   updateShippingAddress,
   clearCart,
   updatePaymentMethod,
+  assignPickedOrder,
+  clearPickedOrder,
 } = cartSlice.actions;
+
 export default cartSlice.reducer;

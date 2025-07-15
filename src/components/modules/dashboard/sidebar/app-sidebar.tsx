@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useUser } from '@/context/UserContext';
+import { getCurrentUser } from '@/service/AuthService';
 import Link from 'next/link';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
@@ -130,7 +131,18 @@ const AgentData = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, setIsLoading } = useUser();
+  const { user, setUser } = useUser();
+
+  const getUserData = async () => {
+    const currentUser = await getCurrentUser();
+    setUser(currentUser);
+  };
+  React.useEffect(() => {
+    if (!user) {
+      getUserData();
+    }
+  }, [user]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

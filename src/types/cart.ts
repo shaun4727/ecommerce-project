@@ -1,7 +1,12 @@
 export interface IOrder {
   products: IOrderProduct[];
   coupon?: string;
-  shippingAddress: string;
+  shippingAddress: {
+    area: string;
+    city: string;
+    zip_code: string;
+    street_or_building_name: string;
+  };
   paymentMethod: string;
   OrderType?: string;
 }
@@ -28,4 +33,11 @@ export interface ICouponData {
   isDeleted: boolean;
   maxDiscountAmount: number;
   minOrderAmount: number;
+}
+
+export interface IShippingAddress {
+  city: string;
+  zip_code: string;
+  street_or_building_name: string;
+  area: string;
 }

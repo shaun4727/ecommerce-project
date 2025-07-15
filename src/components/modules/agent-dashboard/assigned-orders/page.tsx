@@ -27,12 +27,23 @@ import {
 } from '@/components/ui/table';
 import { orderAssignedStatus } from '@/constants';
 import { useUser } from '@/context/UserContext';
-import { getOrdersOfAgentApi, updateAgentPickStatusApi } from '@/service/cart';
+import {
+  assignPickedOrder,
+  clearPickedOrder,
+  pickedOrderSelector,
+} from '@/redux/features/cartSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  getOrdersOfAgentApi,
+  updateAgentPickStatusApi,
+  updateOrderDeliveryStatusApi,
+} from '@/service/cart';
 import { IAgentOrder } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import AgentLocationTracker from '../agentLocationTracker';
 
 function PaymentBadge({ status }: { status: string }) {
   if (status === orderAssignedStatus.delivered) {
@@ -194,7 +205,10 @@ function MobileOrderCard({ order }: { order: IAgentOrder }) {
           </div>
 
           <div className="text-gray-500">Address</div>
-          <div className="font-medium text-gray-900">{order.destination}</div>
+          <div className="font-medium text-gray-900">
+            {order.destination.area},{order.destination.street_or_building_name}
+            ,{order.destination.city} {order.destination.zip_code}, Bangladesh
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -208,6 +222,10 @@ export default function AssignedOrderHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [orderDetailData, setOrderDetailData] = useState<IAgentOrder[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [orderPicked, setOrderPicked] = useState(false);
+  const dispatch = useAppDispatch();
+
+  const pickedOrder = useAppSelector(pickedOrderSelector);
 
   const { user } = useUser();
 
@@ -258,9 +276,10 @@ export default function AssignedOrderHistory() {
     }
   };
   const filteredOrders = orderDetailData.filter((order) => {
+    const formattedAddress = `${order.destination.street_or_building_name}, ${order.destination.area}, ${order.destination.city} - ${order.destination.zip_code}`;
     const matchesSearch =
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.destination.toLowerCase().includes(searchTerm.toLowerCase());
+      formattedAddress.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesSearch;
   });
@@ -277,16 +296,20 @@ export default function AssignedOrderHistory() {
   const submitDeliveryStatus = async (data: deliveryFormData) => {
     // loginUserApi
     let toastId: number | string = 1;
-    console.log(data);
+
     try {
+      const formObj = {
+        ...data,
+        orderId: pickedOrder.orderId,
+      };
       toastId = toast.loading('...Loading', {
         id: toastId,
       });
-      const res = { success: true, message: 'message' };
+      const res = await updateOrderDeliveryStatusApi(formObj);
 
       if (res?.success) {
         reset();
-
+        dispatch(clearPickedOrder());
         toastId = toast.success('User logged in successfully!', {
           id: toastId,
         });
@@ -318,11 +341,13 @@ export default function AssignedOrderHistory() {
     }
   };
 
-  const openDeliveryDrawer = async () => {
+  const openDeliveryDrawer = async (order: IAgentOrder) => {
     try {
+      dispatch(assignPickedOrder(order));
       const res = await updateAgentPick();
       if (res) {
         setOpenDrawer(true);
+        setOrderPicked(true);
       }
     } catch (err: any) {
       console.log(err);
@@ -340,6 +365,7 @@ export default function AssignedOrderHistory() {
             View all your assigned orders detail
           </p>
         </div>
+        {orderPicked && <AgentLocationTracker />}
 
         {/* Filters and Search */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
@@ -392,19 +418,31 @@ export default function AssignedOrderHistory() {
                     className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                   >
                     <TableCell className="font-medium">#{order._id}</TableCell>
-                    <TableCell>{order.destination}</TableCell>
+                    <TableCell>
+                      {order.destination.area}, {order.destination.city},
+                      Bangladesh{' '}
+                    </TableCell>
                     <TableCell>
                       <PaymentBadge status={order.status} />
                     </TableCell>
                     <TableCell>
                       {order.status === orderAssignedStatus.assigned && (
-                        <Button variant="default" onClick={openDeliveryDrawer}>
+                        <Button
+                          variant="default"
+                          onClick={() => openDeliveryDrawer(order)}
+                        >
                           Pick
                         </Button>
                       )}
 
-                      {order.status === orderAssignedStatus.picked &&
-                        'Already Picked!'}
+                      {order.status === orderAssignedStatus.picked && (
+                        <Button
+                          variant="default"
+                          onClick={() => setOpenDrawer(true)}
+                        >
+                          Update Order
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -454,7 +492,7 @@ export default function AssignedOrderHistory() {
                               />
                             </FormControl>
                             <FormLabel className="text-sm font-normal">
-                              Delivery
+                              Delivered
                             </FormLabel>
                           </FormItem>
                         )}
@@ -473,7 +511,7 @@ export default function AssignedOrderHistory() {
                               />
                             </FormControl>
                             <FormLabel className="text-sm font-normal">
-                              Payment Status
+                              Payment Completed
                             </FormLabel>
                           </FormItem>
                         )}

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,13 +30,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { orderType } from '@/constants';
 import { cities } from '@/constants/cities';
 import { useUser } from '@/context/UserContext';
 import { currencyFormatter } from '@/lib/currencyFormatters';
 import {
-  citySelector,
   clearCart,
   couponSelector,
   decrementOrderQuantity,
@@ -51,15 +49,17 @@ import {
   shippingCostSelector,
   shopSelector,
   subTotalSelector,
-  updateCity,
   updatePaymentMethod,
   updateShippingAddress,
 } from '@/redux/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createOrder } from '@/service/cart';
 import { IProduct } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import z from 'zod';
 
 interface CartItem {
   id: string;
@@ -74,6 +74,17 @@ interface CartItem {
   maxQuantity: number;
 }
 
+const shippingAddressSchema = z.object({
+  city: z.string().min(1, 'City is required'),
+  zip_code: z.string().min(1, 'Zip code is required'),
+  street_or_building_name: z
+    .string()
+    .min(1, 'Street or Building name is required'),
+  area: z.string().min(1, 'Area name is required'),
+});
+
+type shippingAddressData = z.infer<typeof shippingAddressSchema>;
+
 export default function ShoppingCartSection() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState('');
@@ -85,13 +96,40 @@ export default function ShoppingCartSection() {
   const shippingCost = useAppSelector(shippingCostSelector);
   const grandTotal = useAppSelector(grandTotalSelector);
   const order = useAppSelector(orderSelector);
-  const city = useAppSelector(citySelector);
   const shippingAddress = useAppSelector(shippingAddressSelector);
   const cartProducts = useAppSelector(orderedProductsSelector);
   const coupon = useAppSelector(couponSelector);
   const user = useUser();
   const router = useRouter();
   const shopId = useAppSelector(shopSelector);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    setValue,
+    reset,
+  } = useForm<shippingAddressData>({
+    resolver: zodResolver(shippingAddressSchema),
+    defaultValues: {
+      city: shippingAddress.city ?? '', // ✅ this avoids "expected string, received undefined"
+      zip_code: shippingAddress.zip_code ?? '',
+      street_or_building_name: shippingAddress.street_or_building_name ?? '',
+      area: shippingAddress.area ?? '',
+    },
+  });
+
+  useEffect(() => {
+    if (shippingAddress) {
+      reset({
+        city: shippingAddress.city || '',
+        zip_code: shippingAddress.zip_code || '',
+        street_or_building_name: shippingAddress.street_or_building_name || '',
+        area: shippingAddress.area || '',
+      });
+    }
+  }, [shippingAddress, reset]);
 
   const incrementQuantity = (id: string) => {
     dispatch(incrementOrderQuantity(id));
@@ -105,23 +143,12 @@ export default function ShoppingCartSection() {
     dispatch(removeProduct(id));
   };
 
-  const handleCitySelect = (value: string) => {
-    dispatch(updateCity(value));
-  };
-
-  const handleShippingAddress = (address: string) => {
-    dispatch(updateShippingAddress(address));
-  };
-
   const validationMsgsOnOrder = () => {
     if (!user.user) {
       router.push('/login');
       throw new Error('Please login first.');
     }
 
-    if (!city) {
-      throw new Error('City is missing');
-    }
     if (!shippingAddress) {
       throw new Error('Shipping address is missing');
     }
@@ -195,6 +222,14 @@ export default function ShoppingCartSection() {
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);
+    }
+  };
+  const storeShippingAddressData = (data: shippingAddressData) => {
+    console.log('asdf', data);
+    try {
+      dispatch(updateShippingAddress(data));
+    } catch (err: any) {
+      console.log(err);
     }
   };
   //   const updateQuantity = (id: string, newQuantity: number) => {
@@ -388,99 +423,120 @@ export default function ShoppingCartSection() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Full Name */}
-                  {/* <div className="space-y-2">
-                    <Label
-                      htmlFor="fullName"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Full Name *
-                    </Label>
-                    <Input
-                      id="fullName"
-                      placeholder="Enter your full name"
-                      className="w-full"
-                    />
-                  </div> */}
+                <form onSubmit={handleSubmit(storeShippingAddressData)}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="city"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        City *
+                      </Label>
+                      <Controller
+                        name="city"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select your city" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {cities.map((city) => (
+                                <SelectItem key={city} value={city}>
+                                  {city}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.city && (
+                        <p className="text-red-500 text-sm">
+                          {errors.city.message}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Phone Number */}
-                  {/* <div className="space-y-2">
-                    <Label
-                      htmlFor="phone"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Phone Number *
-                    </Label>
-                    <Input
-                      id="phone"
-                      placeholder="Enter your phone number"
-                      className="w-full"
-                    />
-                  </div> */}
-
-                  {/* City Selection */}
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="city"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      City *
-                    </Label>
-                    <Select
-                      value={city}
-                      onValueChange={(city) => handleCitySelect(city)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select your city" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {/* ZIP Code */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="zipCode"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        ZIP Code *
+                      </Label>
+                      <Input
+                        id="zipCode"
+                        placeholder="Enter ZIP code"
+                        {...register('zip_code')}
+                        className="w-full"
+                      />
+                      {errors.zip_code && (
+                        <p className="text-red-500 text-sm">
+                          {errors.zip_code.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  {/* ZIP Code */}
-                  {/* <div className="space-y-2">
-                    <Label
-                      htmlFor="zipCode"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      ZIP Code *
-                    </Label>
-                    <Input
-                      id="zipCode"
-                      placeholder="Enter ZIP code"
-                      className="w-full"
-                    />
-                  </div> */}
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* City Selection */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="street"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Street or Building name *
+                      </Label>
+                      <Input
+                        id="street"
+                        placeholder="Enter street name"
+                        {...register('street_or_building_name')}
+                        className="w-full"
+                      />
+                      {errors.street_or_building_name && (
+                        <p className="text-red-500 text-sm">
+                          {errors.street_or_building_name.message}
+                        </p>
+                      )}
+                    </div>
 
-                {/* Address Textarea */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="address"
-                    className="text-sm font-medium text-gray-700"
+                    {/* ZIP Code */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="areaName"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Area Name *
+                      </Label>
+                      <Input
+                        id="areaName"
+                        placeholder="Enter area name"
+                        {...register('area')}
+                        className="w-full"
+                      />
+                      {errors.area && (
+                        <p className="text-red-500 text-sm">
+                          {errors.area.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    //   disabled={reCaptchaStatus ? false : true}
+
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 mt-6"
+                    type="submit"
                   >
-                    Street Address *
-                  </Label>
-                  <Textarea
-                    id="address"
-                    value={shippingAddress}
-                    onChange={(e) => handleShippingAddress(e.target.value)}
-                    placeholder="Enter your complete street address including apartment, suite, or building number"
-                    className="w-full min-h-[100px] resize-none"
-                    rows={4}
-                  />
-                </div>
-
+                    SUBMIT
+                  </Button>
+                </form>
                 {/* Address Validation */}
                 {!false && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mt-4">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                       <p className="text-sm text-yellow-800">

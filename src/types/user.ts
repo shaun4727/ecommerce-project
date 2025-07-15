@@ -71,7 +71,12 @@ export interface IOrderData {
   discount: number;
   deliveryCharge: number;
   status: string;
-  shippingAddress: string;
+  shippingAddress: {
+    area: string;
+    city: string;
+    zip_code: string;
+    street_or_building_name: string;
+  };
   paymentMethod: string;
   paymentStatus: string;
   totalAmount: number;

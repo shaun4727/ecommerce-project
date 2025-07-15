@@ -25,15 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} cnt-home`}
-        >
-          <Toaster richColors position="top-center" />
-          {children}
-        </body>
-      </html>
-    </Providers>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} cnt-home`}>
+        <Toaster richColors position="top-center" />
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }

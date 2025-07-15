@@ -1,12 +1,15 @@
 'use client';
 
+import { MapProvider } from '@/context/GoogleMapContext';
 import UserProvider from '@/context/UserContext';
 import StoreProvider from './StoreProvider';
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <UserProvider>
-      <StoreProvider>{children}</StoreProvider>
+      <StoreProvider>
+        <MapProvider>{children}</MapProvider>
+      </StoreProvider>
     </UserProvider>
   );
 };

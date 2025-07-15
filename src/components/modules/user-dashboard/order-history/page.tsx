@@ -293,7 +293,7 @@ export default function OrderHistory() {
   }, [steps]);
 
   const handleTrackOrder = () => {
-    router.push('/track-agent');
+    router.push(`/track-agent?orderId=${activeOrder?._id}`);
   };
   const getUserOrderDetailMethod = async () => {
     try {
@@ -447,7 +447,12 @@ export default function OrderHistory() {
               {/* <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 cursor-pointer hover:text-gray-600" /> */}
             </div>
             <div className="space-y-1 text-sm sm:text-base text-gray-700">
-              <p className="font-medium">{order.shippingAddress}</p>
+              <p className="font-medium">{order.shippingAddress.area}</p>
+              <p>{order.shippingAddress.street_or_building_name}</p>
+              <p>
+                {order.shippingAddress.city} {order.shippingAddress.zip_code}
+              </p>
+              <p>Bangladesh</p>
               {/* <p>4567 Elm Street, Apt 3B,</p> */}
             </div>
           </div>
@@ -661,7 +666,6 @@ export default function OrderHistory() {
                   </div>
                 </TableHead>
 
-                <TableHead>Payment</TableHead>
                 <TableHead
                   className="cursor-pointer"
                   onClick={() => handleSort('total')}
@@ -700,9 +704,6 @@ export default function OrderHistory() {
                     <TableCell className="font-medium">#{order._id}</TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
 
-                    <TableCell>
-                      <PaymentBadge status={order.status} />
-                    </TableCell>
                     <TableCell>
                       BDT {Number(order.totalAmount).toFixed(2)}
                     </TableCell>

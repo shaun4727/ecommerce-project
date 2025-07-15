@@ -52,7 +52,12 @@ export interface IStep {
 export interface IAgentOrder {
   _id: string;
   orderId: string;
-  destination: string;
+  destination: {
+    area: string;
+    city: string;
+    zip_code: string;
+    street_or_building_name: string;
+  };
   agentId: string | IUser;
   status: 'Picked' | 'Delivered' | 'Assigned';
   createdAt: string;
