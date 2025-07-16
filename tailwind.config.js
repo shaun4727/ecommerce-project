@@ -17,6 +17,7 @@ const config = {
     },
   },
   plugins: [tailwindcssAnimate],
+  output: 'standalone',
 };
 
 export default config;
