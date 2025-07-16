@@ -11,7 +11,8 @@
 }
 
 p.login-redirection span {
-  @apply text-primary cursor-pointer;
+  color: #ff0000;
+  cursor: pointer;
 }
 .register-section .create-new-account .error-message {
   color: red !important;

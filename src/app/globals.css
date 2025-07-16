@@ -28,7 +28,9 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
+.text-primary {
+  color: #ff0000;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
