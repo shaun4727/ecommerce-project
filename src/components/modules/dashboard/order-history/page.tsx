@@ -50,22 +50,22 @@ import { toast } from 'sonner';
 import z from 'zod';
 
 function PaymentBadge({ status }: { status: string }) {
-  if (status === 'Success') {
+  if (status === 'Completed') {
     return (
       <Badge
         variant="outline"
         className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200"
       >
-        ● Success
+        ● Completed
       </Badge>
     );
-  } else if (status === 'Pending') {
+  } else if (status === 'Pending' || status === 'Picked') {
     return (
       <Badge
         variant="outline"
         className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200"
       >
-        ● Pending
+        ● {status}
       </Badge>
     );
   } else {
@@ -272,6 +272,7 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
         agentId: data.agent,
         status: orderAssignedStatus.assigned,
       };
+
       const res = await assignAgentApi(formData as IAgentOrder);
 
       if (res?.success) {
@@ -293,8 +294,9 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
   };
 
   const selectedOrder = (order: IOrderData) => {
-    setOpen(true);
+    // console.log(order);
     setSelectedOrderForAgent(order);
+    setOpen(true);
   };
 
   useEffect(() => {

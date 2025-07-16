@@ -171,3 +171,21 @@ export const assignAgentApi = async (formData: IAgentOrder) => {
     return Error(err.message);
   }
 };
+
+export const getDeliveryAddressFromAgentOrder = async (agentId: string) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/get-delivery-address/${agentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+        },
+      }
+    );
+
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};

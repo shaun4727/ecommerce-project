@@ -24,6 +24,7 @@ interface InitialState {
   };
   paymentMethod: string;
   pickedOrder: IAgentOrder;
+  globalLoader: boolean;
 }
 
 const initialState: InitialState = {
@@ -56,6 +57,7 @@ const initialState: InitialState = {
     createdAt: '',
     updatedAt: '',
   },
+  globalLoader: false,
 };
 
 export const fetchCoupon = createAsyncThunk(
@@ -131,6 +133,9 @@ const cartSlice = createSlice({
     },
     updateShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
+    },
+    updateGlobalLoaderState: (state, action) => {
+      state.globalLoader = action.payload;
     },
     clearCart: (state) => {
       state.products = [];
@@ -262,6 +267,9 @@ export const shippingAddressSelector = (state: RootState) => {
 export const pickedOrderSelector = (state: RootState) => {
   return state.cart.pickedOrder;
 };
+export const globalStateLoaderSelector = (state: RootState) => {
+  return state.cart.globalLoader;
+};
 
 export const {
   addProduct,
@@ -273,6 +281,7 @@ export const {
   updatePaymentMethod,
   assignPickedOrder,
   clearPickedOrder,
+  updateGlobalLoaderState,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

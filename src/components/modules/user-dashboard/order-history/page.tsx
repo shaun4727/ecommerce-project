@@ -44,6 +44,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { updateGlobalLoaderState } from '@/redux/features/cartSlice';
+import { useAppDispatch } from '@/redux/hooks';
 import { getMyOrderDetailApi } from '@/service/cart';
 import { IOrderData, IStep } from '@/types';
 import { useRouter } from 'next/navigation';
@@ -273,6 +275,7 @@ export default function OrderHistory() {
   const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [activeOrder, setActiveOrder] = useState<IOrderData | null>(null);
+  const dispatch = useAppDispatch();
 
   const ordersPerPage = 10;
   type TabSwitchKey = 'productDetail' | 'shipment' | 'completed';
@@ -285,6 +288,7 @@ export default function OrderHistory() {
   const router = useRouter();
 
   useEffect(() => {
+    dispatch(updateGlobalLoaderState(false));
     getUserOrderDetailMethod();
   }, []);
 
@@ -398,6 +402,8 @@ export default function OrderHistory() {
     setActiveOrder(order);
     if (order.status === 'Picked') {
       steps[1].active = true;
+    } else {
+      steps[1].active = false;
     }
     setOpenDrawer(true);
   };
@@ -447,10 +453,11 @@ export default function OrderHistory() {
               {/* <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 cursor-pointer hover:text-gray-600" /> */}
             </div>
             <div className="space-y-1 text-sm sm:text-base text-gray-700">
-              <p className="font-medium">{order.shippingAddress.area}</p>
-              <p>{order.shippingAddress.street_or_building_name}</p>
+              <p className="font-medium">{order.shippingAddress?.area ?? ''}</p>
+              <p>{order.shippingAddress?.street_or_building_name ?? ''}</p>
               <p>
-                {order.shippingAddress.city} {order.shippingAddress.zip_code}
+                {order.shippingAddress?.city ?? ''}{' '}
+                {order.shippingAddress?.zip_code ?? ''}
               </p>
               <p>Bangladesh</p>
               {/* <p>4567 Elm Street, Apt 3B,</p> */}

@@ -1,7 +1,9 @@
-import { shippingAddressSelector } from '@/redux/features/cartSlice';
-import { useAppSelector } from '@/redux/hooks';
+import SpinnerLoader from '@/components/loaders/loader-component';
+import { getDeliveryAddressFromAgentOrder } from '@/service/Product';
+import { IAgentOrder, IUser } from '@/types';
 import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useUser } from './UserContext';
 
 interface IDeliveryAddress {
   lat: number;
@@ -22,7 +24,7 @@ interface MapProviderProps {
 }
 
 export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
-  const shippingAddress = useAppSelector(shippingAddressSelector);
+  const [shippingAddress, setShippingAddress] = useState<IAgentOrder>();
   const [deliveryAddress, setDeliveryAddress] = useState<IDeliveryAddress>({
     lat: 0,
     lng: 0,
@@ -33,6 +35,23 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
     googleMapsApiKey: 'AIzaSyAUF9iPbyH4nrwkZXVza__RSrSWiNOKsuo',
     libraries: ['places'],
   });
+
+  const { user } = useUser();
+
+  const getDeliveryAddress = async (user: IUser) => {
+    try {
+      const res = await getDeliveryAddressFromAgentOrder(user.userId);
+      setShippingAddress(res.data);
+    } catch (err: any) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      getDeliveryAddress(user);
+    }
+  }, [user]);
 
   /**
    * calculation of destination lat,lng starts
@@ -56,22 +75,23 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
       });
     });
   };
+
   useEffect(() => {
     if (!isLoaded) return;
     // const coords = pickedOrder;
-    const shippingAddr = `${shippingAddress.street_or_building_name}, ${shippingAddress.area}, ${shippingAddress.city}, ${shippingAddress.zip_code}, Bangladesh`;
+    const shippingAddr = `${shippingAddress?.destination.street_or_building_name}, ${shippingAddress?.destination.area}, ${shippingAddress?.destination.city}, ${shippingAddress?.destination.zip_code}, Bangladesh`;
     getLatLngFromAddress(shippingAddr)
       .then((cords) => {
         setDeliveryAddress(cords);
       })
       .catch((err) => console.log(err));
   }, [isLoaded]);
-  console.log(deliveryAddress);
+
   /**
    * calculation of destination lat,lng ends
    */
 
-  if (!isLoaded) return <div>Loading Map...</div>;
+  if (!isLoaded) return <SpinnerLoader />;
 
   return (
     <MapContext.Provider
