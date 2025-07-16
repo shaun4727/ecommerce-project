@@ -9,7 +9,12 @@ const config = {
     './src/**/*.{ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#1d4ed8', // 👈 Your custom primary color here
+        secondary: '#9333ea',
+      },
+    },
   },
   plugins: [tailwindcssAnimate],
 };
