@@ -22,7 +22,7 @@ export const middleware = async (request: NextRequest) => {
     } else {
       return NextResponse.redirect(
         new URL(
-          `http://localhost:3000/login?redirectPath=${pathname}`,
+          `${process.env.NEXT_PUBLIC_CLIENT_LINK}/login?redirectPath=${pathname}`,
           request.url
         )
       );
