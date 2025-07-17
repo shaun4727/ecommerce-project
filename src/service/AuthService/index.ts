@@ -65,7 +65,12 @@ export const loginUserApi = async (userData: Record<string, unknown>) => {
     const result = await res.json();
 
     if (result.success) {
-      (await cookies()).set('ecommerce-accessToken', result.data.accessToken);
+      //   const response = NextResponse.json({ success: true });
+
+      (await cookies()).set('ecommerce-accessToken', result.data.accessToken, {
+        httpOnly: true,
+        path: '/',
+      });
       (await cookies()).set(
         'ecommerce-refreshToken',
         result?.data?.refreshToken
