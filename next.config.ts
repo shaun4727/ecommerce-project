@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://103.174.51.143:5002/api/v1/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
