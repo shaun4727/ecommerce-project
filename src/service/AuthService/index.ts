@@ -70,14 +70,12 @@ export const loginUserApi = async (userData: Record<string, unknown>) => {
 
       response.cookies.set('ecommerce-accessToken', result.data.accessToken, {
         httpOnly: true,
-        path: '/',
       });
       response.cookies.set(
         'ecommerce-refreshToken',
         result?.data?.refreshToken,
         {
           httpOnly: true,
-          path: '/',
         }
       );
     }
