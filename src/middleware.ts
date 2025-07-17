@@ -16,18 +16,18 @@ export const middleware = async (request: NextRequest) => {
 
   const userInfo = await getCurrentUser();
 
-  //   if (!userInfo) {
-  //     if (authRoutes.includes(pathname)) {
-  //       return NextResponse.next();
-  //     } else {
-  //       return NextResponse.redirect(
-  //         new URL(
-  //           `${process.env.NEXT_PUBLIC_CLIENT_LINK}/login?redirectPath=${pathname}`,
-  //           request.url
-  //         )
-  //       );
-  //     }
-  //   }
+  if (!userInfo) {
+    if (authRoutes.includes(pathname)) {
+      return NextResponse.next();
+    } else {
+      return NextResponse.redirect(
+        new URL(
+          `${process.env.NEXT_PUBLIC_CLIENT_LINK}/login?redirectPath=${pathname}`,
+          request.url
+        )
+      );
+    }
+  }
 
   //   const role = userInfo.role as Role;
   //   const allowedRoutes = roleBasedPrivateRoutes[role];
@@ -44,13 +44,11 @@ export const middleware = async (request: NextRequest) => {
   //     }
   //   }
 
-  //   if (role === 'agent') {
-  //     return NextResponse.redirect(new URL('/agent/dashboard', request.url));
-  //   }
-
   if (userInfo?.role && roleBasedPrivateRoutes[userInfo?.role as Role]) {
     const routes = roleBasedPrivateRoutes[userInfo?.role as Role];
-
+    if (userInfo.role === 'agent') {
+      return NextResponse.redirect(new URL('/agent/dashboard', request.url));
+    }
     if (routes.some((route) => pathname.match(route))) {
       return NextResponse.next();
     }
