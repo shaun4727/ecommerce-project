@@ -6,13 +6,16 @@ import { cookies } from 'next/headers';
 
 export const registerUserApi = async (userData: Record<string, unknown>) => {
   try {
-    const res = await fetch(`/api/user/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/user/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      }
+    );
     revalidateTag('UserDetail');
     const result = await res.json();
 
@@ -24,16 +27,19 @@ export const registerUserApi = async (userData: Record<string, unknown>) => {
 
 export const getAllUsersApi = async () => {
   try {
-    const res = await fetch(`/api/user/`, {
-      method: 'GET',
-      headers: {
-        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
-        'Content-Type': 'application/json',
-      },
-      next: {
-        tags: ['UserDetail'],
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/user/`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+        next: {
+          tags: ['UserDetail'],
+        },
+      }
+    );
 
     const result = await res.json();
 
@@ -86,13 +92,16 @@ export const getCurrentUser = async () => {
 
 export const getProfileDataApi = async () => {
   try {
-    const res = await fetch(`/api/user/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/user/me`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+        },
+      }
+    );
 
     const result = await res.json();
     return result;
@@ -129,7 +138,7 @@ export const getNewToken = async () => {
   try {
     const res = await fetch(
       //   `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
-      `/api/auth/refresh-token`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/auth/refresh-token`,
       {
         method: 'POST',
         headers: {
