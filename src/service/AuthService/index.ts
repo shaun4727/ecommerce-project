@@ -3,11 +3,10 @@
 import { jwtDecode } from 'jwt-decode';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
 
 export const registerUserApi = async (userData: Record<string, unknown>) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/api/user/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,7 +24,7 @@ export const registerUserApi = async (userData: Record<string, unknown>) => {
 
 export const getAllUsersApi = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/api/user/`, {
       method: 'GET',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -46,28 +45,24 @@ export const getAllUsersApi = async () => {
 
 export const loginUserApi = async (userData: Record<string, unknown>) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/api/auth/login`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      }
+    );
 
     const result = await res.json();
 
     if (result.success) {
-      const response = NextResponse.json({ success: true });
-
-      response.cookies.set('ecommerce-accessToken', result.data.accessToken, {
-        httpOnly: true,
-      });
-      response.cookies.set(
+      (await cookies()).set('ecommerce-accessToken', result.data.accessToken);
+      (await cookies()).set(
         'ecommerce-refreshToken',
-        result?.data?.refreshToken,
-        {
-          httpOnly: true,
-        }
+        result?.data?.refreshToken
       );
     }
 
@@ -91,7 +86,7 @@ export const getCurrentUser = async () => {
 
 export const getProfileDataApi = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/me`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/api/user/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +129,7 @@ export const getNewToken = async () => {
   try {
     const res = await fetch(
       //   `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
-      `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/api/auth/refresh-token`,
       {
         method: 'POST',
         headers: {
