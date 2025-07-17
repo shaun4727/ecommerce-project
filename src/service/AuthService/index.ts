@@ -3,6 +3,7 @@
 import { jwtDecode } from 'jwt-decode';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export const registerUserApi = async (userData: Record<string, unknown>) => {
   try {
@@ -65,15 +66,19 @@ export const loginUserApi = async (userData: Record<string, unknown>) => {
     const result = await res.json();
 
     if (result.success) {
-      //   const response = NextResponse.json({ success: true });
+      const response = NextResponse.json({ success: true });
 
-      (await cookies()).set('ecommerce-accessToken', result.data.accessToken, {
+      response.cookies.set('ecommerce-accessToken', result.data.accessToken, {
         httpOnly: true,
         path: '/',
       });
-      (await cookies()).set(
+      response.cookies.set(
         'ecommerce-refreshToken',
-        result?.data?.refreshToken
+        result?.data?.refreshToken,
+        {
+          httpOnly: true,
+          path: '/',
+        }
       );
     }
 
