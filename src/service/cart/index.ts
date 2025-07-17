@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 
 export const createOrder = async (order: IOrder) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/order`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/order`, {
       method: 'POST',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -28,7 +28,7 @@ export const addCoupon = async (
 ) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/coupon/${couponCode}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/coupon/${couponCode}`,
       {
         method: 'POST',
         headers: {
@@ -47,7 +47,7 @@ export const addCoupon = async (
 
 export const createCouponApi = async (formData: any) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/coupon`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/coupon`, {
       method: 'POST',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -65,7 +65,7 @@ export const createCouponApi = async (formData: any) => {
 
 export const getAllCouponApi = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/coupon`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/coupon`, {
       method: 'GET',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -86,7 +86,7 @@ export const getAllCouponApi = async () => {
 export const applyCouponCodeApi = async (coupon: ICoupon) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/coupon/${coupon.couponCode}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/coupon/${coupon.couponCode}`,
       {
         method: 'POST',
         headers: {
@@ -106,7 +106,7 @@ export const applyCouponCodeApi = async (coupon: ICoupon) => {
 export const getMyOrderDetailApi = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/my-orders`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/my-orders`,
       {
         method: 'GET',
         headers: {
@@ -125,7 +125,7 @@ export const getMyOrderDetailApi = async () => {
 export const getOrdersOfAgentApi = async (agentId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/agent-orders/${agentId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/agent-orders/${agentId}`,
       {
         method: 'GET',
         headers: {
@@ -147,7 +147,7 @@ export const getOrdersOfAgentApi = async (agentId: string) => {
 export const getMyShopOrdersApi = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/my-shop-orders`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/my-shop-orders`,
       {
         method: 'GET',
         headers: {
@@ -166,7 +166,7 @@ export const getMyShopOrdersApi = async () => {
 export const updateAgentPickStatusApi = async (agentId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/user/update-agent-status/${agentId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/user/update-agent-status/${agentId}`,
       {
         method: 'PATCH',
         headers: {
@@ -187,7 +187,7 @@ export const updateOrderDeliveryStatusApi = async (
 ) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/update-delivery-status/${obj.orderId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/update-delivery-status/${obj.orderId}`,
       {
         method: 'PATCH',
         headers: {

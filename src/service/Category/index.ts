@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 // create category
 export const createCategory = async (data: FormData) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/category`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`, {
       method: 'POST',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -25,7 +25,7 @@ export const createCategory = async (data: FormData) => {
 //get all categories
 export const getAllCategories = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/category`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`, {
       next: {
         tags: ['CATEGORY'],
       },
@@ -41,7 +41,7 @@ export const getAllCategories = async () => {
 export const deleteCategory = async (categoryId: string): Promise<any> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/category/${categoryId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/category/${categoryId}`,
       {
         method: 'DELETE',
         headers: {

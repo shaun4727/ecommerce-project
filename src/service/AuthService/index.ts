@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 
 export const registerUserApi = async (userData: Record<string, unknown>) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/user/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const registerUserApi = async (userData: Record<string, unknown>) => {
 
 export const getAllUsersApi = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/user/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/`, {
       method: 'GET',
       headers: {
         Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
@@ -46,16 +46,13 @@ export const getAllUsersApi = async () => {
 
 export const loginUserApi = async (userData: Record<string, unknown>) => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/auth/login`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
 
     const result = await res.json();
 
@@ -94,7 +91,7 @@ export const getCurrentUser = async () => {
 
 export const getProfileDataApi = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/user/me`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -137,7 +134,7 @@ export const getNewToken = async () => {
   try {
     const res = await fetch(
       //   `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/auth/refresh-token`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
       {
         method: 'POST',
         headers: {
