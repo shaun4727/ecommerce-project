@@ -43,7 +43,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
      * what does the following code does?
      */
     return () => {
-      socketInstance.disconnect();
+      // Only disconnect if you want to manually control connection lifecycle
+      //   socketInstance.disconnect();
     };
   }, []);
 
