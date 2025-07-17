@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 export const addFlashSale = async (productData: any): Promise<any> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/flash-sale`,
       {
         method: 'POST',
         headers: {
@@ -28,7 +28,7 @@ export const addFlashSale = async (productData: any): Promise<any> => {
 export const getFlashSaleProducts = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/flash-sale`,
       {
         next: {
           tags: ['PRODUCT'],

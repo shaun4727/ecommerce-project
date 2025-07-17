@@ -37,7 +37,7 @@ export const getAllProducts = async (
   if (query?.trending) {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product/trending`
+        `${process.env.NEXT_PUBLIC_CLIENT_LINK}/product/trending`
       );
 
       return await res.json();
@@ -49,7 +49,7 @@ export const getAllProducts = async (
   if (query?.flashSale) {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`
+        `${process.env.NEXT_PUBLIC_CLIENT_LINK}/flash-sale`
       );
 
       return await res.json();
@@ -60,7 +60,7 @@ export const getAllProducts = async (
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product?limit=${limit}&page=${page}&${params}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/product?limit=${limit}&page=${page}&${params}`,
       {
         next: {
           tags: ['PRODUCT'],
@@ -78,7 +78,7 @@ export const getAllProducts = async (
 export const getSingleProduct = async (productId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product/${productId}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/product/${productId}`,
       {
         next: {
           tags: ['PRODUCT'],
@@ -95,16 +95,13 @@ export const getSingleProduct = async (productId: string) => {
 // add product
 export const addProduct = async (productData: FormData): Promise<any> => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product`,
-      {
-        method: 'POST',
-        body: productData,
-        headers: {
-          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
-        },
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/product`, {
+      method: 'POST',
+      body: productData,
+      headers: {
+        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+      },
+    });
     revalidateTag('PRODUCT');
     return res.json();
   } catch (error: any) {
@@ -119,7 +116,7 @@ export const updateProduct = async (
 ): Promise<any> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product/${productId}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/product/${productId}`,
       {
         method: 'PATCH',
         body: productData,
@@ -138,7 +135,7 @@ export const updateProduct = async (
 export const getTrendingProductsApi = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/product/trending`
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/product/trending`
     );
     const data = await res.json();
     return data;
@@ -150,7 +147,7 @@ export const getTrendingProductsApi = async () => {
 export const getFlashSaleProductsApi = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/flash-sale`
     );
     const data = await res.json();
     return data;
@@ -162,7 +159,7 @@ export const getFlashSaleProductsApi = async () => {
 export const assignAgentApi = async (formData: IAgentOrder) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/order/assign-agent`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/assign-agent`,
       {
         method: 'POST',
         body: JSON.stringify(formData),
@@ -182,7 +179,7 @@ export const assignAgentApi = async (formData: IAgentOrder) => {
 export const getDeliveryAddressFromAgentOrder = async (agentId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/order/get-delivery-address/${agentId}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/order/get-delivery-address/${agentId}`,
       {
         method: 'GET',
         headers: {

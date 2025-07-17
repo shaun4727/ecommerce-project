@@ -6,14 +6,11 @@ import { getValidToken } from '../../lib/verifyToken';
 //  get all brands
 export const getAllBrands = async () => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/brand`,
-      {
-        next: {
-          tags: ['Brands'],
-        },
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/brand`, {
+      next: {
+        tags: ['Brands'],
+      },
+    });
     const data = await res.json();
     return data;
   } catch (error: any) {
@@ -26,16 +23,13 @@ export const createBrand = async (brandData: FormData): Promise<any> => {
   const token = await getValidToken();
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/brand`,
-      {
-        method: 'POST',
-        body: brandData,
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_LINK}/brand`, {
+      method: 'POST',
+      body: brandData,
+      headers: {
+        Authorization: token,
+      },
+    });
 
     revalidateTag('Brands');
 
@@ -51,7 +45,7 @@ export const deleteBrand = async (brandId: string): Promise<any> => {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/brand/${brandId}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/brand/${brandId}`,
       {
         method: 'DELETE',
         headers: {
@@ -69,7 +63,7 @@ export const deleteBrand = async (brandId: string): Promise<any> => {
 export const homePageBrandWithProduct = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/brand/brands-with-product`
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/brand/brands-with-product`
     );
 
     return res.json();
