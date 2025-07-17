@@ -29,7 +29,7 @@ export const middleware = async (request: NextRequest) => {
   //     }
   //   }
 
-  const role = userInfo.role as Role;
+  //   const role = userInfo.role as Role;
   //   const allowedRoutes = roleBasedPrivateRoutes[role];
 
   //   if (allowedRoutes && allowedRoutes.some((regex) => regex.test(pathname))) {
@@ -44,9 +44,9 @@ export const middleware = async (request: NextRequest) => {
   //     }
   //   }
 
-  if (role === 'agent') {
-    return NextResponse.redirect(new URL('/agent/dashboard', request.url));
-  }
+  //   if (role === 'agent') {
+  //     return NextResponse.redirect(new URL('/agent/dashboard', request.url));
+  //   }
 
   if (userInfo?.role && roleBasedPrivateRoutes[userInfo?.role as Role]) {
     const routes = roleBasedPrivateRoutes[userInfo?.role as Role];
