@@ -6,13 +6,16 @@ import { cookies } from 'next/headers';
 // create category
 export const createCategory = async (data: FormData) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`, {
-      method: 'POST',
-      headers: {
-        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
-      },
-      body: data,
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/category`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+        },
+        body: data,
+      }
+    );
 
     revalidateTag('CATEGORY');
 
@@ -25,11 +28,14 @@ export const createCategory = async (data: FormData) => {
 //get all categories
 export const getAllCategories = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`, {
-      next: {
-        tags: ['CATEGORY'],
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/category`,
+      {
+        next: {
+          tags: ['CATEGORY'],
+        },
+      }
+    );
 
     return res.json();
   } catch (error: any) {
@@ -41,7 +47,7 @@ export const getAllCategories = async () => {
 export const deleteCategory = async (categoryId: string): Promise<any> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/category/${categoryId}`,
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/category/${categoryId}`,
       {
         method: 'DELETE',
         headers: {

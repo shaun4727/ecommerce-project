@@ -5,14 +5,17 @@ import { cookies } from 'next/headers';
 // add Flash Sale
 export const addFlashSale = async (productData: any): Promise<any> => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/flash-sale`, {
-      method: 'POST',
-      headers: {
-        Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(productData),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      }
+    );
 
     revalidateTag('PRODUCT');
     return res.json();
@@ -24,11 +27,14 @@ export const addFlashSale = async (productData: any): Promise<any> => {
 // get Flash Sale Products
 export const getFlashSaleProducts = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/flash-sale`, {
-      next: {
-        tags: ['PRODUCT'],
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_CLIENT_LINK}/api/flash-sale`,
+      {
+        next: {
+          tags: ['PRODUCT'],
+        },
+      }
+    );
     const data = await res.json();
     return data;
   } catch (error: any) {
