@@ -16,18 +16,18 @@ export const middleware = async (request: NextRequest) => {
 
   const userInfo = await getCurrentUser();
 
-  //   if (!userInfo) {
-  //     if (authRoutes.includes(pathname)) {
-  //       return NextResponse.next();
-  //     } else {
-  //       return NextResponse.redirect(
-  //         new URL(
-  //           `${process.env.NEXT_PUBLIC_CLIENT_LINK}/login?redirectPath=${pathname}`,
-  //           request.url
-  //         )
-  //       );
-  //     }
-  //   }
+  if (!userInfo) {
+    if (authRoutes.includes(pathname)) {
+      return NextResponse.next();
+    } else {
+      return NextResponse.redirect(
+        new URL(
+          `${process.env.NEXT_PUBLIC_CLIENT_LINK}/login?redirectPath=${pathname}`,
+          request.url
+        )
+      );
+    }
+  }
 
   //   const role = userInfo.role as Role;
   //   const allowedRoutes = roleBasedPrivateRoutes[role];
