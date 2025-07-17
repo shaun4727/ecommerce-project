@@ -22,21 +22,6 @@ export const middleware = async (request: NextRequest) => {
     }
   }
 
-  //   const role = userInfo.role as Role;
-  //   const allowedRoutes = roleBasedPrivateRoutes[role];
-
-  //   if (allowedRoutes && allowedRoutes.some((regex) => regex.test(pathname))) {
-  //     return NextResponse.next(); // ✅ route is allowed for this role
-  //   }
-
-  //   if (userInfo?.role && roleBasedPrivateRoutes[userInfo?.role as Role]) {
-  //     const routes = roleBasedPrivateRoutes[userInfo?.role as Role];
-
-  //     if (routes.some((route) => pathname.match(route))) {
-  //       return NextResponse.next();
-  //     }
-  //   }
-
   if (userInfo?.role && roleBasedPrivateRoutes[userInfo?.role as Role]) {
     const routes = roleBasedPrivateRoutes[userInfo?.role as Role];
     if (userInfo.role === 'agent') {
@@ -59,9 +44,5 @@ export const config = {
     '/user',
     '/user/:page',
     '/track-agent',
-    '/agent',
-    '/agent/:page',
-    '/',
-    '/:page',
   ],
 };
