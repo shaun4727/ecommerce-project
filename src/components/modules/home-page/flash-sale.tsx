@@ -140,7 +140,6 @@ function CountdownTimer() {
 }
 
 function ProductCard({ product }: { product: IProduct }) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const progressPercentage = 25;
   const router = useRouter();
 
@@ -166,22 +165,6 @@ function ProductCard({ product }: { product: IProduct }) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-
-          {/* Wishlist Button */}
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            className={`absolute top-3 right-3 rounded-full w-8 h-8 ${
-              isWishlisted
-                ? 'bg-red-500 text-white'
-                : 'bg-white/80 text-gray-600 hover:bg-white'
-            }`}
-            onClick={() => setIsWishlisted(!isWishlisted)}
-          >
-            <Heart
-              className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`}
-            />
-          </Button> */}
 
           {/* Discount Badge */}
           <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white">

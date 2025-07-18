@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import {
@@ -64,19 +65,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  quantity: number;
-  size?: string;
-  color?: string;
-  inStock: boolean;
-  maxQuantity: number;
-}
-
 const shippingAddressSchema = z.object({
   city: z.string().min(1, 'City is required'),
   zip_code: z.string().min(1, 'Zip code is required'),
@@ -92,7 +80,6 @@ export default function ShoppingCartSection() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState('');
   const [paymentOption, setPaymentOption] = useState(0);
-  const [deliveryPlaced, setDeliveryPlaced] = useState(1);
   const dispatch = useAppDispatch();
   const products = useAppSelector(orderedProductsSelector);
   const subTotal = useAppSelector(subTotalSelector);
@@ -113,7 +100,6 @@ export default function ShoppingCartSection() {
     handleSubmit,
     formState: { errors },
     control,
-    setValue,
     reset,
   } = useForm<shippingAddressData>({
     resolver: zodResolver(shippingAddressSchema),
@@ -173,7 +159,7 @@ export default function ShoppingCartSection() {
         dispatch(updatePaymentMethod('Online'));
       }
       let orderData;
-      let toastID = 1;
+      const toastID = 1;
       if (coupon.code) {
         orderData = { ...order, coupon: coupon.code, OrderType: type };
       } else {
@@ -194,8 +180,10 @@ export default function ShoppingCartSection() {
       if (!res.success) {
         toast.error(res.message, { id: toastID });
       }
-    } catch (error: any) {
-      toast.error(error.message, { id: toastId });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, { id: toastId });
+      }
     }
   };
 
@@ -203,19 +191,15 @@ export default function ShoppingCartSection() {
     try {
       validationMsgsOnOrder();
       setPaymentOption(1);
-    } catch (err: any) {
-      console.log(err);
-      toast.error(err.message, { id: 0 });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, { id: 1 });
+      }
     }
   };
 
   const applyPromoCode = async () => {
     try {
-      const formObj = {
-        orderAmount: subTotal,
-        shopId,
-        couponCode: promoCode,
-      };
       const res = dispatch(
         fetchCoupon({
           couponCode: String(promoCode),
@@ -225,9 +209,10 @@ export default function ShoppingCartSection() {
       );
 
       console.log(res);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, { id: 1 });
+      }
     }
   };
   const storeShippingAddressData = (data: shippingAddressData) => {
@@ -598,7 +583,7 @@ export default function ShoppingCartSection() {
                   {appliedPromo && (
                     <div className="flex items-center justify-between bg-green-50 p-3 rounded-md">
                       <span className="text-sm text-green-700">
-                        Promo "{appliedPromo}" applied
+                        Promo {appliedPromo} applied
                       </span>
                       <Button
                         variant="ghost"

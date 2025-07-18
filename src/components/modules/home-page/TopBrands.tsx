@@ -191,7 +191,7 @@ export default function TopBrands({
               Top Brands
             </h2>
             <p className="text-gray-600">
-              Discover products from the world's leading brands
+              Discover products from the worlds leading brands
             </p>
           </div>
 

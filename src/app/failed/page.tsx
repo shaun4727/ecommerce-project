@@ -14,7 +14,7 @@ const FailedPage = () => {
             Payment Failed
           </h1>
           <p className="text-gray-600 mb-6 text-center">
-            We're sorry, but your payment could not be processed. Please check
+            We are sorry, but your payment could not be processed. Please check
             your payment details and try again.
           </p>
 

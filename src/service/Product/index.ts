@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 import { IAgentOrder } from '@/types';
 import { revalidateTag } from 'next/cache';
@@ -42,7 +43,7 @@ export const getAllProducts = async (
 
       return await res.json();
     } catch (err) {
-      err;
+      console.log(err);
     }
   }
 

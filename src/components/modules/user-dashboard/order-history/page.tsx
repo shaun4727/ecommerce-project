@@ -271,7 +271,6 @@ export default function OrderHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentTab, setCurrentTab] = useState<IStep | undefined>(undefined);
   const [filterStatus, setFilterStatus] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [activeOrder, setActiveOrder] = useState<IOrderData | null>(null);
@@ -382,10 +381,9 @@ export default function OrderHistory() {
   });
 
   // Pagination
-  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfLastOrder = 1 * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = sortedOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(sortedOrders.length / ordersPerPage);
 
   if (isLoading) {
     return (
@@ -737,7 +735,7 @@ export default function OrderHistory() {
                 </DrawerHeader>
                 <div className="mb-6">
                   <p className="text-sm sm:text-base text-gray-600">
-                    Let's boost your sales with powerful insights and effective
+                    Lets boost your sales with powerful insights and effective
                     strategies today
                   </p>
                 </div>

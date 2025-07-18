@@ -142,42 +142,7 @@ function StarRating({
   );
 }
 
-function ColorSwatches({
-  colors,
-  selectedColor,
-  onColorChange,
-}: {
-  colors: ColorOption[];
-  selectedColor: string;
-  onColorChange: (color: string) => void;
-}) {
-  return (
-    <div className="flex items-center space-x-1">
-      {colors.slice(0, 4).map((color) => (
-        <button
-          key={color.name}
-          className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
-            selectedColor === color.value
-              ? 'border-blue-500 scale-110'
-              : 'border-gray-300 hover:border-gray-400'
-          }`}
-          style={{ backgroundColor: color.value }}
-          onClick={() => onColorChange(color.value)}
-          title={color.name}
-        />
-      ))}
-      {colors.length > 4 && (
-        <span className="text-xs text-gray-500 ml-1">+{colors.length - 4}</span>
-      )}
-    </div>
-  );
-}
-
 function ProductCard({ product }: { product: IProduct }) {
-  const [selectedColor, setSelectedColor] = useState(
-    product.availableColors?.[0] || ''
-  );
-
   const router = useRouter();
 
   const getDetailOfSingleProduct = () => {
@@ -216,13 +181,6 @@ function ProductCard({ product }: { product: IProduct }) {
               ${product.price.toFixed(2)}
             </span>
           </div>
-
-          {/* Color Options */}
-          {/* <ColorSwatches
-            colors={product.colors}
-            selectedColor={selectedColor}
-            onColorChange={setSelectedColor}
-          /> */}
         </div>
       </CardContent>
     </Card>
@@ -310,11 +268,9 @@ export default function FeaturedProducts({
 
           {/* Mobile Grid */}
           <div className="md:hidden grid grid-cols-2 gap-4">
-            {trendingProducts
-              ?.slice(0, 4)
-              .map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
+            {trendingProducts?.slice(0, 4).map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
           </div>
         </div>
 

@@ -48,7 +48,6 @@ export default function CreateShopComponent() {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     reset,
   } = useForm<shopFormData>({
     resolver: zodResolver(createShopSchema),
@@ -82,7 +81,7 @@ export default function CreateShopComponent() {
         console.log(res.message);
         toastId = toast.error(res.message, { id: toastId });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('error occured', { id: toastId });
       console.error(err);
     }

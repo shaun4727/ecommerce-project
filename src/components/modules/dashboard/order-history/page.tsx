@@ -234,12 +234,10 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailData, setOrderDetailData] = useState<IOrderData[]>([]);
   const [open, setOpen] = useState<boolean>(false);
   const [selectedOrderForAgent, setSelectedOrderForAgent] =
     useState<IOrderData | null>(null);
-  const ordersPerPage = 10;
 
   /**
    * Assigning agent to order
@@ -250,12 +248,7 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
 
   type registerFormData = z.infer<typeof registerSchema>;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<registerFormData>({
+  const { register, handleSubmit, reset } = useForm<registerFormData>({
     resolver: zodResolver(registerSchema),
   });
   const onSubmit = async (data: registerFormData) => {
@@ -385,10 +378,8 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
   };
 
   // Pagination
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = sortedOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(sortedOrders.length / ordersPerPage);
+
+  const currentOrders = sortedOrders.map((item) => item);
 
   if (isLoading) {
     return (
@@ -584,19 +575,14 @@ export default function OrderHistoryAdmin({ agents }: { agents: IUser[] }) {
                                           (agent: IUser) =>
                                             agent.role === 'agent'
                                         )
-                                        .map(
-                                          (
-                                            filteredAgent: IUser,
-                                            idx: number
-                                          ) => (
-                                            <SelectItem
-                                              key={filteredAgent._id}
-                                              value={String(filteredAgent._id)}
-                                            >
-                                              {filteredAgent.name}
-                                            </SelectItem>
-                                          )
-                                        )}
+                                        .map((filteredAgent: IUser) => (
+                                          <SelectItem
+                                            key={filteredAgent._id}
+                                            value={String(filteredAgent._id)}
+                                          >
+                                            {filteredAgent.name}
+                                          </SelectItem>
+                                        ))}
                                     </SelectGroup>
                                   </SelectContent>
                                 </Select>

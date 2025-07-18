@@ -13,72 +13,15 @@ import { Slider } from '@/components/ui/slider';
 import { addProduct } from '@/redux/features/cartSlice';
 import { useAppDispatch } from '@/redux/hooks';
 import { homePageBrandWithProduct } from '@/service/Brand';
-import { IBrandWithProducts, ICategory, IMeta, IProduct } from '@/types';
+import { IBrandWithProducts, IMeta, IProduct } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-
-interface FilterCategory {
-  name: string;
-  items: string[];
-  isOpen: boolean;
-}
 
 interface Brand {
   id: string;
   name: string;
   count: number;
 }
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  rating: number;
-  reviews: number;
-  category: string;
-  brand: string;
-}
-
-const filterCategories: FilterCategory[] = [
-  {
-    name: 'Camera',
-    items: ['DSLR', 'Mirrorless', 'Point & Shoot', 'Action Cameras', 'Lenses'],
-    isOpen: false,
-  },
-  {
-    name: 'Desktops',
-    items: [
-      'Gaming PCs',
-      'All-in-One',
-      'Mini PCs',
-      'Workstations',
-      'Custom Built',
-    ],
-    isOpen: false,
-  },
-  {
-    name: 'Pants',
-    items: ['Jeans', 'Chinos', 'Dress Pants', 'Cargo', 'Shorts'],
-    isOpen: false,
-  },
-  {
-    name: 'Bags',
-    items: ['Backpacks', 'Handbags', 'Laptop Bags', 'Travel Bags', 'Wallets'],
-    isOpen: false,
-  },
-  {
-    name: 'Hats',
-    items: ['Baseball Caps', 'Beanies', 'Fedoras', 'Sun Hats', 'Bucket Hats'],
-    isOpen: false,
-  },
-  {
-    name: 'Accessories',
-    items: ['Watches', 'Jewelry', 'Sunglasses', 'Belts', 'Scarves'],
-    isOpen: false,
-  },
-];
 
 const brands: Brand[] = [
   { id: 'nike', name: 'Nike', count: 245 },
@@ -121,10 +64,6 @@ function StarRating({
 }
 
 type productsWithId = IProduct & {
-  _id: string;
-};
-
-type categoryWithId = ICategory & {
   _id: string;
 };
 
@@ -241,7 +180,7 @@ export default function AllProductsSection({
         key !== 'page' &&
         key !== 'category'
     );
-    let string: string[] = [];
+    const string: string[] = [];
     filtered.forEach((param) => {
       const [key, value] = param;
       string.push(`${key}=${value}`);

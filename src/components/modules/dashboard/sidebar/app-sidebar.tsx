@@ -133,15 +133,16 @@ const AgentData = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, setUser } = useUser();
 
-  const getUserData = async () => {
+  const getUserData = React.useCallback(async () => {
     const currentUser = await getCurrentUser();
     setUser(currentUser);
-  };
+  }, [setUser]);
+
   React.useEffect(() => {
     if (!user) {
       getUserData();
     }
-  }, [user]);
+  }, [user, getUserData]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

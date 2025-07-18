@@ -45,7 +45,7 @@ export default function OrderTracking() {
           Order ID: TXNID983274
         </h1>
         <p className="text-sm sm:text-base text-gray-600">
-          Let's boost your sales with powerful insights and effective strategies
+          Lets boost your sales with powerful insights and effective strategies
           today
         </p>
       </div>

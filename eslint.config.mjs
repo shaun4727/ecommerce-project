@@ -25,11 +25,14 @@ const eslintConfig = [
     },
     rules: {
       'prettier/prettier': 'warn', // Warn on Prettier formatting issues
-      '@typescript-eslint/no-unused-vars': ['error', {
-        vars: 'all',
-        args: 'after-used',
-        ignoreRestSiblings: true,
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          args: 'after-used',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
 ];

@@ -2,8 +2,6 @@
 
 import { useGoogleMap } from '@/context/GoogleMapContext';
 import { useUser } from '@/context/UserContext';
-import { pickedOrderSelector } from '@/redux/features/cartSlice';
-import { useAppSelector } from '@/redux/hooks';
 import { useEffect } from 'react';
 
 interface AgentLocationTracker {
@@ -34,8 +32,6 @@ const getDistanceInMeters = (
 };
 
 export default function AgentLocationTracker() {
-  const pickedOrder = useAppSelector(pickedOrderSelector);
-
   const { user, socket } = useUser();
   const { deliveryAddress, shippingAddress } = useGoogleMap();
 

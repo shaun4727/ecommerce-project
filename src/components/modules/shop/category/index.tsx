@@ -37,8 +37,8 @@ const ManageCategories = ({ categories }: TCategoriesProps) => {
           toast.error(res.message);
         }
       }
-    } catch (err: any) {
-      console.error(err?.message);
+    } catch (err: unknown) {
+      console.error(err);
     }
   };
 

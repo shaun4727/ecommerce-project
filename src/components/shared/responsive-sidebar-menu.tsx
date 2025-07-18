@@ -266,7 +266,7 @@ export default function MobileSidebarNav() {
           >
             <div className="flex flex-col h-full">
               <nav className="flex-1 py-4">
-                {menuItems.map((item, index) => (
+                {menuItems.map((item) => (
                   <div key={item.name}>
                     {item.categories ? (
                       <Collapsible

@@ -86,7 +86,7 @@ export default function AgentAccountCreation({ agents }: { agents: IUser[] }) {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Agent List</h1>
-          <p className="text-gray-600 mt-1">View all your agent's detail</p>
+          <p className="text-gray-600 mt-1">View all your agents detail</p>
         </div>
 
         <Drawer direction={'right'}>

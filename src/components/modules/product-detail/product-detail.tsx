@@ -162,7 +162,6 @@ function SimilarProducts({ similarProduct }: { similarProduct: IProduct[] }) {
 
 export default function ProductDetail({ product }: { product: IProduct }) {
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [email, setEmail] = useState('');
   const dispatch = useAppDispatch();
   const [similarProduct, setSimilarProduct] = useState<IProduct[]>([]);
@@ -331,20 +330,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       ADD TO CART
                     </Button>
-                    {/* <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setIsWishlisted(!isWishlisted)}
-                      className={
-                        isWishlisted
-                          ? 'bg-red-50 border-red-200 text-red-600'
-                          : ''
-                      }
-                    >
-                      <Heart
-                        className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`}
-                      />
-                    </Button> */}
+
                     <Button variant="outline" size="icon">
                       <Share2 className="h-4 w-4" />
                     </Button>

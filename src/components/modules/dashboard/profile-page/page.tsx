@@ -186,25 +186,44 @@ function ProfileSkeleton() {
   );
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active: boolean;
+  payload: { color: string; dataKey: string; value: string }[];
+  label: string;
+}) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-medium text-gray-900">{`${label}`}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {`${entry.dataKey === 'orders' ? 'Orders' : 'Revenue'}: ${
-              entry.dataKey === 'revenue' ? '$' : ''
-            }${entry.value}${entry.dataKey === 'revenue' ? '' : ''}`}
-          </p>
-        ))}
+        {payload.map(
+          (
+            entry: { color: string; dataKey: string; value: string },
+            index: number
+          ) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {`${entry.dataKey === 'orders' ? 'Orders' : 'Revenue'}: ${
+                entry.dataKey === 'revenue' ? '$' : ''
+              }${entry.value}${entry.dataKey === 'revenue' ? '' : ''}`}
+            </p>
+          )
+        )}
       </div>
     );
   }
   return null;
 }
 
-function PieTooltip({ active, payload }: any) {
+function PieTooltip({
+  active,
+  payload,
+}: {
+  active: boolean;
+  payload: { payload: { status: string; count: number; percentage: number } }[];
+}) {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -470,7 +489,23 @@ export default function DashboardProfile() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
                     <YAxis stroke="#6b7280" fontSize={12} />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip
+                      content={(props) => (
+                        <CustomTooltip
+                          active={!!props.active}
+                          payload={
+                            Array.isArray(props.payload)
+                              ? (props.payload as {
+                                  color: string;
+                                  dataKey: string;
+                                  value: string;
+                                }[])
+                              : []
+                          }
+                          label={props.label ?? ''}
+                        />
+                      )}
+                    />
                     <Bar
                       dataKey={chartType}
                       fill="#3B82F6"
@@ -508,7 +543,22 @@ export default function DashboardProfile() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip content={<PieTooltip />} />
+                    <Tooltip
+                      content={(props) => (
+                        <PieTooltip
+                          active={props.active!}
+                          payload={
+                            props.payload as {
+                              payload: {
+                                status: string;
+                                count: number;
+                                percentage: number;
+                              };
+                            }[]
+                          }
+                        />
+                      )}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

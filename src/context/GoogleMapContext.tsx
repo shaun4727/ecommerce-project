@@ -6,6 +6,7 @@ import { IAgentOrder, IUser } from '@/types';
 import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from './UserContext';
+import { toast } from 'sonner';
 
 interface IDeliveryAddress {
   lat: number;
@@ -49,8 +50,10 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
       const res = await getDeliveryAddressFromAgentOrder(user.userId);
       dispatch(assignPickedOrder(res.data));
       setShippingAddress(res.data);
-    } catch (err: any) {
-      console.log(err);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, { id: 1 });
+      }
     }
   };
 

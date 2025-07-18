@@ -7,27 +7,10 @@ import { IMeta } from '@/types';
 import { ICouponData } from '@/types/cart';
 import { ColumnDef } from '@tanstack/react-table';
 import { Edit, Eye, Trash } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
-const CouponTable = ({
-  coupons,
-  meta,
-}: {
-  coupons: ICouponData[];
-  meta: IMeta;
-}) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProductsId, setSelectedProductsId] = useState<string[]>([]);
-  console.log(coupons);
-  const router = useRouter();
-
+const CouponTable = ({ coupons }: { coupons: ICouponData[]; meta: IMeta }) => {
   const handleView = (product: ICouponData) => {
     console.log('Viewing product:', product);
-  };
-
-  const handleDelete = (productId: string) => {
-    console.log('Deleting product with ID:', productId);
   };
 
   const columns: ColumnDef<ICouponData>[] = [
