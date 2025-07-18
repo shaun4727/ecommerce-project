@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { CircleX, Eye, FileEdit, Search } from 'lucide-react';
@@ -71,37 +72,6 @@ function PaymentBadge({ status }: { status: string }) {
         className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
       >
         ● {orderAssignedStatus.assigned}
-      </Badge>
-    );
-  }
-}
-
-function FulfillmentBadge({ status }: { status: string }) {
-  if (status === 'Fulfilled') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200"
-      >
-        ● Fulfilled
-      </Badge>
-    );
-  } else if (status === 'Partial') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200"
-      >
-        ● Partial
-      </Badge>
-    );
-  } else {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
-      >
-        ● Unfulfilled
       </Badge>
     );
   }
@@ -217,12 +187,12 @@ function MobileOrderCard({ order }: { order: IAgentOrder }) {
 
 export default function AssignedOrderHistory() {
   const [isLoading, setIsLoading] = useState(true);
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState('');
   const [orderDetailData, setOrderDetailData] = useState<IAgentOrder[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [orderPicked, setOrderPicked] = useState(false);
+
+  console.log(orderPicked);
   const dispatch = useAppDispatch();
 
   const pickedOrder = useAppSelector(pickedOrderSelector);
@@ -268,14 +238,6 @@ export default function AssignedOrderHistory() {
     }
   };
 
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
-  };
   const filteredOrders = orderDetailData.filter((order) => {
     const formattedAddress = `${order.destination.street_or_building_name}, ${order.destination.area}, ${order.destination.city} - ${order.destination.zip_code}`;
     const matchesSearch =

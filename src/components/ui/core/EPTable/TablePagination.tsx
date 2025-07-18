@@ -27,7 +27,7 @@ const TablePagination = ({
     //     key !== 'brands' &&
     //     key !== 'rating'
     // );
-    let string: string[] = [];
+    const string: string[] = [];
     // filtered.forEach((param) => {
     //   const [key, value] = param;
     //   string.push(`${key}=${value}`);

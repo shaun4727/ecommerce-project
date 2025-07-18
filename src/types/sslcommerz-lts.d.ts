@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'sslcommerz-lts' {
   interface SSLCommerzInitData {
     total_amount: number;

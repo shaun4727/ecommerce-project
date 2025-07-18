@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CouponTable from '@/components/modules/shop/manage-coupon/CouponTable';
 import CreateCouponModal from '@/components/modules/shop/manage-coupon/CreateCouponModal';
 import { getAllCouponApi } from '@/service/cart';

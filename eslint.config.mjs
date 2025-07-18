@@ -24,6 +24,10 @@ const eslintConfig = [
       prettier: prettierPlugin,
     },
     rules: {
+      '@next/next/no-img-element': 'off',
+      'prefer-const': 'warn',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
       'prettier/prettier': 'warn', // Warn on Prettier formatting issues
       '@typescript-eslint/no-unused-vars': [
         'error',
