@@ -1,7 +1,7 @@
 # === Stage 1: Builder ===
 FROM node:18-alpine AS builder
 
-WORKDIR /app
+WORKDIR /
 
 COPY package*.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -10,9 +10,9 @@ COPY . .
 RUN yarn build
 
 # === Stage 2: Runtime ===
-FROM node:18-slim
+FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
