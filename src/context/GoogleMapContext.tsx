@@ -1,4 +1,6 @@
 import SpinnerLoader from '@/components/loaders/loader-component';
+import { assignPickedOrder } from '@/redux/features/cartSlice';
+import { useAppDispatch } from '@/redux/hooks';
 import { getDeliveryAddressFromAgentOrder } from '@/service/Product';
 import { IAgentOrder, IUser } from '@/types';
 import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
@@ -15,6 +17,7 @@ interface IMapProviderValues {
   deliveryAddress: IDeliveryAddress;
   GoogleMap: typeof GoogleMap;
   MarkerF: typeof MarkerF;
+  shippingAddress: IAgentOrder | undefined;
 }
 
 const MapContext = createContext<IMapProviderValues | undefined>(undefined);
@@ -23,17 +26,20 @@ interface MapProviderProps {
   children: React.ReactNode;
 }
 
+const googleLibraries: ('places' | 'drawing' | 'geometry' | 'visualization')[] =
+  ['places'];
 export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   const [shippingAddress, setShippingAddress] = useState<IAgentOrder>();
   const [deliveryAddress, setDeliveryAddress] = useState<IDeliveryAddress>({
     lat: 0,
     lng: 0,
   });
+  const dispatch = useAppDispatch();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyAUF9iPbyH4nrwkZXVza__RSrSWiNOKsuo',
-    libraries: ['places'],
+    libraries: googleLibraries,
   });
 
   const { user } = useUser();
@@ -41,6 +47,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   const getDeliveryAddress = async (user: IUser) => {
     try {
       const res = await getDeliveryAddressFromAgentOrder(user.userId);
+      dispatch(assignPickedOrder(res.data));
       setShippingAddress(res.data);
     } catch (err: any) {
       console.log(err);
@@ -79,6 +86,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!isLoaded) return;
     // const coords = pickedOrder;
+
     const shippingAddr = `${shippingAddress?.destination.street_or_building_name}, ${shippingAddress?.destination.area}, ${shippingAddress?.destination.city}, ${shippingAddress?.destination.zip_code}, Bangladesh`;
     getLatLngFromAddress(shippingAddr)
       .then((cords) => {
@@ -100,6 +108,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
         children,
         GoogleMap,
         MarkerF,
+        shippingAddress,
       }}
     >
       {children}

@@ -255,6 +255,7 @@ export default function AssignedOrderHistory() {
   const getUserOrderDetailMethod = async () => {
     try {
       const res = await getOrdersOfAgentApi(user!.userId);
+
       if (res.success) {
         setOrderDetailData(res.data);
       } else {
@@ -310,7 +311,9 @@ export default function AssignedOrderHistory() {
       if (res?.success) {
         reset();
         dispatch(clearPickedOrder());
-        toastId = toast.success('User logged in successfully!', {
+        setOpenDrawer(false);
+        await getUserOrderDetailMethod();
+        toastId = toast.success('Order updated successfully!', {
           id: toastId,
         });
       } else {
@@ -365,7 +368,8 @@ export default function AssignedOrderHistory() {
             View all your assigned orders detail
           </p>
         </div>
-        {orderPicked && <AgentLocationTracker />}
+        {<AgentLocationTracker />}
+        {/* {orderPicked && <AgentLocationTracker />} */}
 
         {/* Filters and Search */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
