@@ -60,16 +60,14 @@ export default function AgentLocationTracker() {
           target.lng
         );
 
-        console.log(
-          `📍 Initial Position: (${latitude}, ${longitude}), Distance: ${distance}m`
-        );
+        // console.log(
+        //   `📍 Initial Position: (${latitude}, ${longitude}), Distance: ${distance}m`
+        // );
 
-        const locationAnddeliveryAddress = {
+        socket?.emit('realtime_location', {
           ...deliveryAddress,
           ...shippingAddress,
-        };
-
-        socket?.emit('realtime_location', locationAnddeliveryAddress);
+        });
 
         if (distance <= radius) {
           console.log(
@@ -90,16 +88,16 @@ export default function AgentLocationTracker() {
               target.lng
             );
 
-            console.log(
-              `📍 Watching: (${latitude}, ${longitude}), Distance: ${distance}m`
-            );
+            // console.log(
+            //   `📍 Watching: (${latitude}, ${longitude}), Distance: ${distance}m`
+            // );
 
-            const locationAnddeliveryAddress = {
+            socket?.emit('realtime_location', {
               ...deliveryAddress,
               ...shippingAddress,
-            };
-
-            socket?.emit('realtime_location', locationAnddeliveryAddress);
+              latitude,
+              longitude,
+            });
 
             if (distance <= radius) {
               console.log('✅ Reached target location. Stopping tracking.');
@@ -130,10 +128,14 @@ export default function AgentLocationTracker() {
   };
 
   useEffect(() => {
-    if (user?.role === 'agent') {
+    if (
+      user?.role === 'agent' &&
+      deliveryAddress?.lat &&
+      deliveryAddress?.lng
+    ) {
       getAgentLocation();
     }
-  }, [deliveryAddress, shippingAddress]);
+  }, [user?.role, deliveryAddress]);
 
   return null; // nothing to render
 }

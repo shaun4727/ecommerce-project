@@ -101,11 +101,14 @@ const cartSlice = createSlice({
       );
 
       if (productToAdd) {
-        productToAdd.orderQuantity += 1;
+        productToAdd.orderQuantity += action.payload.quantity;
         return;
       }
 
-      state.products.push({ ...action.payload, orderQuantity: 1 });
+      state.products.push({
+        ...action.payload,
+        orderQuantity: action.payload.quantity ?? 1,
+      });
     },
     incrementOrderQuantity: (state, action) => {
       const productToIncrement = state.products.find(

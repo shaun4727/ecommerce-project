@@ -165,7 +165,7 @@ export default function ShoppingCartSection() {
       } else {
         orderData = order;
       }
-
+      orderData.paymentMethod = type;
       const res = await createOrder(orderData);
 
       if (res.success) {

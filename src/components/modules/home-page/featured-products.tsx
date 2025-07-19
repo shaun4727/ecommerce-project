@@ -259,7 +259,10 @@ export default function FeaturedProducts({
               }}
             >
               {trendingProducts?.map((product) => (
-                <div key={product._id} className="w-1/4 flex-shrink-0 px-3">
+                <div
+                  key={product._id}
+                  className="w-1/4 flex-shrink-0 px-3 cursor-pointer"
+                >
                   <ProductCard product={product} />
                 </div>
               ))}

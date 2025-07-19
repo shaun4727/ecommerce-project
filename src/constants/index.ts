@@ -11,7 +11,7 @@ export const protectedRoutes = [
 ];
 
 export const orderType = {
-  ssl: 'SSL',
+  ssl: 'Online',
   cod: 'COD',
 };
 

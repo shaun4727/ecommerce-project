@@ -190,9 +190,8 @@ export default function AssignedOrderHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [orderDetailData, setOrderDetailData] = useState<IAgentOrder[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [orderPicked, setOrderPicked] = useState(false);
-
-  console.log(orderPicked);
+  //   const [orderPicked, setOrderPicked] = useState(false);
+  //   console.log(orderPicked);
   const dispatch = useAppDispatch();
 
   const pickedOrder = useAppSelector(pickedOrderSelector);
@@ -311,8 +310,8 @@ export default function AssignedOrderHistory() {
       dispatch(assignPickedOrder(order));
       const res = await updateAgentPick();
       if (res) {
-        setOpenDrawer(true);
-        setOrderPicked(true);
+        setOpenDrawer(false);
+        // setOrderPicked(true);
       }
     } catch (err: any) {
       console.log(err);

@@ -48,6 +48,14 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   const getDeliveryAddress = async (user: IUser) => {
     try {
       const res = await getDeliveryAddressFromAgentOrder(user.userId);
+
+      getLatLngFromAddress(
+        `${res.data?.destination.street_or_building_name}, ${res.data?.destination.area}, ${res.data?.destination.city}, ${res.data?.destination.zip_code}, Bangladesh`
+      )
+        .then((cords) => {
+          setDeliveryAddress(cords);
+        })
+        .catch((err) => console.log(err));
       dispatch(assignPickedOrder(res.data));
       setShippingAddress(res.data);
     } catch (error: unknown) {
@@ -58,7 +66,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && user.role === 'agent') {
       getDeliveryAddress(user);
     }
   }, [user]);
@@ -85,18 +93,6 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
       });
     });
   };
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    // const coords = pickedOrder;
-
-    const shippingAddr = `${shippingAddress?.destination.street_or_building_name}, ${shippingAddress?.destination.area}, ${shippingAddress?.destination.city}, ${shippingAddress?.destination.zip_code}, Bangladesh`;
-    getLatLngFromAddress(shippingAddr)
-      .then((cords) => {
-        setDeliveryAddress(cords);
-      })
-      .catch((err) => console.log(err));
-  }, [isLoaded]);
 
   /**
    * calculation of destination lat,lng ends

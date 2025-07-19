@@ -229,7 +229,10 @@ export default function TopBrands({
               }}
             >
               {allBrands?.map((brand) => (
-                <div key={brand._id} className="w-1/5 flex-shrink-0 px-3">
+                <div
+                  key={brand._id}
+                  className="w-1/5 flex-shrink-0 px-3 cursor-pointer"
+                >
                   <BrandCard brand={brand} />
                 </div>
               ))}

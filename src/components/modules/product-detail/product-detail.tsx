@@ -170,6 +170,7 @@ export default function ProductDetail({ product }: { product: IProduct }) {
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const handleAddProduct = (product: IProduct) => {
+    product.quantity = quantity;
     dispatch(addProduct(product));
   };
 

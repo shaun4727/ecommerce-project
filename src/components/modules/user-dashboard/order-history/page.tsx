@@ -435,10 +435,9 @@ export default function OrderHistory() {
               {/* <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 cursor-pointer hover:text-gray-600" /> */}
             </div>
             <div className="space-y-1 text-sm sm:text-base text-gray-700">
-              <p className="font-medium">Double CTRL Z</p>
-              <p>1234 Market Street, Apt 56,</p>
-              <p>Philadelphia, PA 19107,</p>
-              <p>United States of America</p>
+              <p className="font-medium">EMART Group</p>
+              <p>Tejgaon Industrial Area, 29/C & 29/D</p>
+              <p>Bangladesh</p>
             </div>
           </div>
 
@@ -731,7 +730,7 @@ export default function OrderHistory() {
             <div className="mx-auto w-full overflow-y-scroll">
               <div className="p-4 pb-0">
                 <DrawerHeader>
-                  <DrawerTitle> Order ID: TXNID983274</DrawerTitle>
+                  <DrawerTitle> Order ID: {activeOrder?._id || ''}</DrawerTitle>
                 </DrawerHeader>
                 <div className="mb-6">
                   <p className="text-sm sm:text-base text-gray-600">

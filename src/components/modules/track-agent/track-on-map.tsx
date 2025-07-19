@@ -28,7 +28,6 @@ const TrackAgentOnDelivery: React.FC = () => {
     socket.emit('join_order', { orderId });
 
     const handleLocation = (location: { lat: number; lng: number }) => {
-      console.log('location is ', location);
       setCurrentLocation((prev) =>
         prev.lat === location.lat && prev.lng === location.lng ? prev : location
       );

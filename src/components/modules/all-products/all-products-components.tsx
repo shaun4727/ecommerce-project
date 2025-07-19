@@ -471,7 +471,7 @@ export default function AllProductsSection({
                   <Card
                     key={product._id}
                     onClick={() => getDetailOfTheProduct(product)}
-                    className="hover:shadow-lg transition-shadow duration-200"
+                    className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                   >
                     <CardContent
                       className={

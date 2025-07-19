@@ -124,7 +124,10 @@ export default function CategorySection({ data }: { data: IBrand[] }) {
           <div className="md:hidden">
             <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
               {data?.map((category) => (
-                <div key={category._id} className="flex-shrink-0">
+                <div
+                  key={category._id}
+                  className="flex-shrink-0 cursor-pointer"
+                >
                   <CategoryCard category={category} />
                 </div>
               ))}
