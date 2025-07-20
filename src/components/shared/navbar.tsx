@@ -81,6 +81,7 @@ export default function NavbarComponent() {
     setIsClient(true);
     getCategoriesMethod();
   }, [cartProducts]);
+
   const handleLogout = async () => {
     try {
       const res = await logout();
@@ -118,6 +119,7 @@ export default function NavbarComponent() {
       console.log(err);
     }
   };
+
   const dashboardHandler = () => {
     if (user?.role === 'user') {
       router.push('/user/dashboard');

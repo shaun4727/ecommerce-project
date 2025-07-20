@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -49,68 +48,8 @@ import { useAppDispatch } from '@/redux/hooks';
 import { getMyOrderDetailApi } from '@/service/cart';
 import { IOrderData, IStep } from '@/types';
 import { useRouter } from 'next/navigation';
-
-function PaymentBadge({ status }: { status: string }) {
-  if (status === 'Success') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200"
-      >
-        ● Success
-      </Badge>
-    );
-  } else if (status === 'Pending') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200"
-      >
-        ● Pending
-      </Badge>
-    );
-  } else {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
-      >
-        ● Failed
-      </Badge>
-    );
-  }
-}
-
-function FulfillmentBadge({ status }: { status: string }) {
-  if (status === 'Fulfilled') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200"
-      >
-        ● Fulfilled
-      </Badge>
-    );
-  } else if (status === 'Partial') {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200"
-      >
-        ● Partial
-      </Badge>
-    );
-  } else {
-    return (
-      <Badge
-        variant="outline"
-        className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
-      >
-        ● Unfulfilled
-      </Badge>
-    );
-  }
-}
+import { getCustomerInvoiceApiServer } from '@/service/Product';
+import InvoiceGenerator from './invoiceTemplate';
 
 function OrderHistorySkeleton() {
   return (
@@ -179,7 +118,13 @@ function formatDate(dateTime: string | number | Date) {
   });
 }
 
-function MobileOrderCard({ order }: { order: IOrderData }) {
+function MobileOrderCard({
+  order,
+  orderStatusBtn,
+}: {
+  order: IOrderData;
+  orderStatusBtn: (order: IOrderData) => void;
+}) {
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
@@ -204,11 +149,6 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
           <div className="text-gray-500">Customer</div>
           <div className="font-medium text-gray-900">{order.user.name}</div>
 
-          <div className="text-gray-500">Payment</div>
-          <div>
-            <PaymentBadge status={order.status} />
-          </div>
-
           <div className="text-gray-500">Total</div>
           <div className="font-medium text-gray-900">
             BDT {order.totalAmount.toFixed(2)}
@@ -219,9 +159,11 @@ function MobileOrderCard({ order }: { order: IOrderData }) {
             {order.products.length} items
           </div>
 
-          <div className="text-gray-500">Fulfillment</div>
+          <div className="text-gray-500">Status</div>
           <div>
-            <FulfillmentBadge status={order.status} />
+            <Button variant="outline" onClick={() => orderStatusBtn(order)}>
+              Order Status
+            </Button>
           </div>
         </div>
       </CardContent>
@@ -293,7 +235,7 @@ export default function OrderHistory() {
 
   useEffect(() => {
     setCurrentTab(steps[0]);
-  }, [steps]);
+  }, []);
 
   const handleTrackOrder = () => {
     router.push(`/track-agent?orderId=${activeOrder?._id}`);
@@ -417,6 +359,16 @@ export default function OrderHistory() {
       completed: step.icon === 'CheckCircle' ? 1 : 0,
     };
     setTabSwitch(resetTabs);
+  };
+
+  const fetchInvoice = async () => {
+    try {
+      const res = await getCustomerInvoiceApiServer();
+      InvoiceGenerator(res.data);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const getTabDetail = (order: IOrderData) => {
@@ -631,7 +583,11 @@ export default function OrderHistory() {
             </div>
           ) : (
             currentOrders.map((order) => (
-              <MobileOrderCard key={order._id} order={order} />
+              <MobileOrderCard
+                key={order._id}
+                orderStatusBtn={openDrawerToCheckOrder}
+                order={order}
+              />
             ))
           )}
         </div>
@@ -690,6 +646,9 @@ export default function OrderHistory() {
                 >
                   <div className="flex items-center">Status</div>
                 </TableHead>
+                <TableHead className="cursor-pointer">
+                  <div className="flex items-center">Invoice</div>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -717,6 +676,11 @@ export default function OrderHistory() {
                         onClick={() => openDrawerToCheckOrder(order)}
                       >
                         Order Status
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="default" onClick={() => fetchInvoice()}>
+                        Download
                       </Button>
                     </TableCell>
                   </TableRow>
