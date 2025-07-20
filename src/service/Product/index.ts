@@ -173,6 +173,25 @@ export const assignAgentApi = async (formData: IAgentOrder) => {
   }
 };
 
+export const getCustomerInvoiceApiServer = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order/get-customer-invoice`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: (await cookies()).get('ecommerce-accessToken')!.value,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    return Error(err.message);
+  }
+};
+
 export const getDeliveryAddressFromAgentOrder = async (agentId: string) => {
   try {
     const res = await fetch(

@@ -5,9 +5,11 @@ import React, { useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
+  CreditCard,
   Gem,
   Home,
   Laptop,
+  LogOut,
   Menu,
   ShoppingBag,
   Watch,
@@ -22,6 +24,21 @@ import {
 } from '@/components/ui/collapsible';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/context/UserContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { protectedRoutes } from '@/constants';
+import { usePathname, useRouter } from 'next/navigation';
+import { logout } from '@/service/AuthService';
 
 interface SubMenuItem {
   name: string;
@@ -152,11 +169,6 @@ const menuItems: MenuItem[] = [
     href: '/products?category=683ae03cedd553ace12e63de',
     icon: <Gem className="h-4 w-4" />,
   },
-  {
-    name: 'CREATE SHOP',
-    href: '/create-shop',
-    icon: <ShoppingBag className="h-4 w-4" />,
-  },
 ];
 
 // Add custom scrollbar styles
@@ -227,6 +239,34 @@ export default function MobileSidebarNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['ELECTRONICS']);
 
+  const { user, setUser } = useUser();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const res = await logout();
+      if (res === true) {
+        setUser(null);
+        if (protectedRoutes.some((route) => pathname.match(route))) {
+          router.push('/');
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const dashboardHandler = () => {
+    if (user?.role === 'user') {
+      router.push('/user/dashboard');
+    } else if (user?.role === 'agent') {
+      router.push('/agent/dashboard');
+    } else {
+      router.push('/admin/dashboard');
+    }
+  };
+
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prevExpandedItems) =>
       prevExpandedItems.includes(itemName)
@@ -249,7 +289,7 @@ export default function MobileSidebarNav() {
   return (
     <div className="w-full bg-gradient-to-b from-blue-500 to-blue-600">
       {/* Header with hamburger menu */}
-      <div className="p-4">
+      <div className="p-4 flex justify-between">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button
@@ -350,15 +390,72 @@ export default function MobileSidebarNav() {
                         </Button>
                       </Link>
                     )}
+                    {user?.role === 'admin' && (
+                      <Link
+                        href={`/create-shop`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Button
+                          variant="ghost"
+                          className={cn(
+                            'w-full justify-start px-6 py-3 text-white hover:bg-blue-600 rounded-none font-medium'
+                          )}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <ShoppingBag className="h-4 w-4" />
+                            <span>CREATE SHOP</span>
+                          </div>
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 ))}
               </nav>
             </div>
           </SheetContent>
         </Sheet>
-      </div>
+        {user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar>
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mt-2">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
 
-      {/* Demo content to show the navbar in action */}
+              <DropdownMenuGroup>
+                {/* <DropdownMenuItem>
+                                        <User />
+                                        <span>Profile</span>
+                                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                      </DropdownMenuItem> */}
+                <DropdownMenuItem onClick={dashboardHandler}>
+                  <CreditCard />
+                  <span>Dashboard</span>
+                  <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+
+              <DropdownMenuGroup>
+                {/* <DropdownMenuItem>
+                                        <Users />
+                                        <span>My Shop</span>
+                                      </DropdownMenuItem> */}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="bg-red-500 hover:bg-red-600 text-white cursor-pointer">
+                  <LogOut className="text-white" />
+                  <span onClick={handleLogout}>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
     </div>
   );
 }
